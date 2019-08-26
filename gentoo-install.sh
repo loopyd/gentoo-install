@@ -113,8 +113,6 @@ function msg_anim() {
 msg_anim 'Welcome to the installer!' 'This took about 3 months to write' '5'
 msg_anim 'This script is very long' 'Sit back, relax, and enjoy!' '10'
 
-msg_anim 'Unmount existing partitions' 'For safety...' '5'
-
 # pre-unmount, gotta climb off him first.
 swapoff /dev/mapper/gentoo-swap
 umount -l /mnt/gentoo/sys
@@ -138,9 +136,6 @@ rm -rd /mnt/gentoo
 wipefs -af /dev/nvme0n1
 
 sleep 5s
-
-msg_anim 'Create filesystem' 'I need to make and format a filesystem' '5'
-msg_anim 'Create filesystem' 'I will be using LVM with a single EFI partition' '5'
 
 # ssskskskskskskskskksskksksksksskkskksdisk
 sgdisk -ozg /dev/nvme0n1
@@ -166,10 +161,6 @@ swapon /dev/mapper/gentoo-swap
 
 sleep 5s
 
-msg_anim 'Mount filesystem' 'Need to mount the base gentoo filesystem.' '5'
-msg_anim 'Mount filesystem' 'The root filesystem comes first, followed by...' '5'
-msg_anim 'Mount filesystem' 'all of the others.' '5'
-
 # poop
 mkdir /mnt/gentoo
 mount --types xfs --options rw,noatime,attr2,inode64,noquota /dev/mapper/gentoo-linux_root /mnt/gentoo
@@ -179,13 +170,6 @@ mount --types vfat --options rw,noatime /dev/nvme0n1p1 /mnt/gentoo/boot/efi
 mount --types ext4 --options rw,noatime /dev/mapper/gentoo-var_log /mnt/gentoo/var/log
 
 sleep 5s
-
-msg_anim 'Stage 3 Download' 'We need to grab our stage 3 and portage tarballs.' '5'
-msg_anim 'Stage 3 Download' 'for the purposes of making this video, I have...' '5'
-msg_anim 'Stage 3 Download' '...created a simple bitnami stack running on the...' '5'
-msg_anim 'Stage 3 Download' '...laptop to act as a fileserver.' '5'
-msg_anim 'Stage 3 Download' 'You could emerge -aV wget here and grab the files directly...' '5'
-msg_anim 'Stage 3 Download' 'if you wanted to.' '5'
 
 cd /mnt/gentoo/root/
 # hey kids this is my ip address ugu.
@@ -199,14 +183,6 @@ tar xvpf /mnt/gentoo/root/$(ls | grep 'stage3') --xattrs-include='*.*' --numeric
 tar xvpf /mnt/gentoo/root/$(ls | grep 'portage') --xattrs-include='*.*'--numeric-owner -C /mnt/gentoo/usr
 
 sleep 5s
-
-msg_anim 'Mount filesystem' 'We need to mount the devices gentoo will be using in...' '5'
-msg_anim 'Mount filesystem' '...the chroot.  This means /dev, /sys, /proc, and...' '5'
-msg_anim 'Mount filesystem' '.../dev/pts for compile-time, as well as the...' '5'
-msg_anim 'Mount filesystem' '...temporary filesystems I will need.' '5'
-msg_anim 'Mount filesystem' 'This script also mounts /var/tmp/portage to tmpfs in the...' '5'
-msg_anim 'Mount filesystem' '...fstab configuration file permenantly.' '5'
-msg_anim 'Mount filesystem' 'You can speed up compile time on desktops by doing this.' '5'
 
 # there once was a bug here.  he was squashed.  i use cleanex, it was kosher.
 mount --rbind /proc /mnt/gentoo/proc
@@ -222,27 +198,6 @@ mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=1777,size=16G tmpfs /
 mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=755,size=16G,uid=portage,gid=portage,x-mount.mkdir=755 tmpfs /mnt/gentoo/var/tmp/portage
 
 sleep 5s
-
-msg_anim 'Configure filesystem' 'This script does a lot of injection.  It will inject...' '5'
-msg_anim 'Configure filesystem' '...a configuration that works on my system, for...' '5'
-msg_anim 'Configure filesystem' '...letting this script run.  If you would like to have...' '5'
-msg_anim 'Configure filesystem' '...a look over the source code, you can modify these...' '5'
-msg_anim 'Configure filesystem' '...files yourserlf or review them for learning purposes.' '5'
-msg_anim 'Kernel Notes' 'I am not going to be configurating the kernel, I have done...' '5'
-msg_anim 'Kernel Notes' '...all that before making this demo, as its very tedious...' '5'
-msg_anim 'Kernel Notes' '...work on real hardware.' '5'
-msg_anim 'Kernel Source' 'The kernel configuration is available in the source code.' '5'
-msg_anim 'Kernel Info' 'I am using a configured version of sys-kernel/ck-sources:5.1.7...' '5'
-msg_anim 'Kernel Info' '...with a slimmed down dracut-built initramfs which loads nvidia...' '5'
-msg_anim 'Kernel Info' '...proprietary for my GTX1080, my motherboard NIC drivers, my...' '5'
-msg_anim 'Kernel Info' '...nvme driver support, Sound Blaster ZxR Creative driver...' '5'
-msg_anim 'Kernel Info' '...and LVM to boot the root block.' '5'
-msg_anim 'Fun Fact' 'It took me 27 days to get a properly working kernel and initramfs.' '5'
-msg_anim 'Fun Fact' 'I knew nothing about compiling a kernel or an initramfs when I started.' '5'
-msg_anim 'Fun Fact' 'Gentoo is really good for learning everything you need to know about' '5'
-msg_anim 'Fun Fact' 'linux.  Once you learn it all, every other distro is a slice of cake.' '5'
-msg_anim 'Fun Fact' 'Keep a local copy of the docs handy.  You will need it!' '5'
-msg_anim 'Lets Configure' 'Alright, lets do this!' '5'
 
 sed -i -e 's/^root:\*/root:/' /mnt/gentoo/etc/shadow
 
@@ -294,11 +249,6 @@ ln -s net.lo net.enp10s0
 ln -s net.lo net.enp0s31f6
 cd ~
 
-msg_anim 'Portage autoconfiguration' 'This portion of the screen cleans out and restores a' '5'
-msg_anim 'Portage autoconfiguration' 'fresh portage environment nessecary for the rest of the demo' '5'
-msg_anim 'Live media tweaks' 'to run.  The live medias portage installation is also' '5'
-msg_anim 'Live media tweaks' 'modified slightly for the automake conf portion of the demo' '5'
-msg_anim 'Live media tweaks' 'which tailors make.conf automatically for the system.' '5'
 
 # Portage sounds like an orafice you can-....  nevermind.
 echo 'Cleaning out portage directories...'
@@ -762,7 +712,7 @@ CPU_FLAGS_X86=""
 DISTDIR="/var/cache/distfiles"
 PKGDIR="/var/cache/binpkgs"
 PORTAGE_TMPDIR="/var/tmp/portage"
-EMERGE_DEFAULT_OPTS="--jobs 5 --with-bdeps=y --autounmask=y --autounmask-write=y --keep-going=y" 
+EMERGE_DEFAULT_OPTS="--jobs 1 --with-bdeps=y --keep-going=y" 
 GENTOO_MIRRORS=""
 
 USE="X amd64 posix nptl smp avahi curl ipv6 acpi hddtemp libnotify lm_sensors pam readline syslog unicode usb openssl alsa pulseaudio kde pm-utils dbus policykit udisks lvm -gnome -static -systemd"
@@ -810,8 +760,7 @@ EOF
 sleep 5s
 
 msg_anim 'Chroot' 'The next stage of the installer runs in the chroot.' '5'
-msg_anim 'Chroot' 'My script auto-injects this.  Dont worry, commentary...' '5'
-msg_anim 'Chroot' '...continues within the chroot.  :-)' '5'
+msg_anim 'Chroot' 'My script auto-injects this.' '5'
 
 #- PUT IT INSIDE ME -#
 cat <<'INNERSCRIPT' >/mnt/gentoo/root/chroot_inner_script.sh
@@ -821,139 +770,20 @@ env-update
 source /etc/profile
 export PS1="(chroot) $PS1"
 
-display_center(){
-    local x
-    local y
-    text="$*"
-    x=$(( ($(tput cols) - ${#text}) / 2))
-    echo -ne "\E[6n";read -sdR y; y=$(echo -ne "${y#*[}" | cut -d';' -f1)
-    echo -ne "\033[${y};${x}f$*"
-}
-
-function msg_anim() {
-    local title
-    local subtitle
-    local start
-    local duration
-    local max_duration
-    
-    if [[ "$1x" != "x" ]]; then
-        title="$1"
-    fi
-    if [[ "$2x" != "x" ]]; then
-        subtitle="$2"
-    fi
-    if [[ "$3x" != "x" ]]; then
-        max_duration="$3"
-    fi
-    echo -ne "\\033[2J"
-
-    # 2D Starfield Script by Me!
-    
-    # init
-    tput civis
-    RANDOM=$$$(date +%s)
-    STARCHARS='.+*X'
-    for i in {1..50}; do
-        ranged_random=$RANDOM
-        let "ranged_random %= $(tput cols)"
-        starx[i]=$ranged_random
-        ranged_random=$RANDOM
-        let "ranged_random %= $(tput lines)"
-        stary[i]=$ranged_random
-        ranged_random=$RANDOM
-        let "ranged_random = ranged_random % 4"
-        starspd[i]=$(($ranged_random+1))
-        starchar[i]=${STARCHARS:$((${starspd[i]}-1)):1}
-        ranged_random=$RANDOM
-        let "ranged_random = ranged_random % 7"
-        starcolor[i]=$(($ranged_random+30))
-        if [ ${starspd[i]} -gt "2" ]; then
-            starcolor[i]=$((${starcolor[i]}+60))
-        fi
-    done
-    
-    # draw loop with duration
-    start=$SECONDS
-    duration=$(( SECONDS - start ))
-    while [ $duration -lt "$max_duration" ]; do
-        for i in {1..50}; do
-            if test -z ${starx[i]}; then
-                # initialize new star
-                starx[i]=$(tput cols)
-                ranged_random=$RANDOM
-                let "ranged_random %= $(tput lines)"
-                stary[i]=$ranged_random
-                ranged_random=$RANDOM
-                let "ranged_random = ranged_random % 4"
-                starspd[i]=$(($ranged_random+1))
-                starchar[i]=${STARCHARS:$((${starspd[i]}-1)):1}
-                ranged_random=$RANDOM
-                let "ranged_random = ranged_random % 7"
-                starcolor[i]=$(($ranged_random+30))
-                if [ ${starspd[i]} -gt "3" ]; then
-                    starcolor[i]=$((${starcolor[i]}+60))
-                fi
-            else
-                # erase the old star
-                echo -ne "\033[${stary[i]};${starx[i]}f "
-                starx[i]=$((${starx[i]}-${starspd[i]}))
-                if [ ${starx[i]} -lt "0" ]; then
-                    starx[i]=
-                    stary[i]=
-                    starspd[i]=
-                else
-                    # draw the new star
-                    echo -ne "\033[${stary[i]};${starx[i]}f\e[${starcolor[i]}m${starchar[i]}"               
-                fi
-            fi
-        done
-        
-        echo -ne "\033[10;1f\e[94m"
-        display_center "$title"
-        echo -ne "\033[13;1f\e[93m"
-        display_center "$subtitle"
-        
-        read -t 0.01 -N 1 input
-        if [[ $input = "q" ]] || [[ $input = "Q" ]]; then
-            echo
-            break
-        fi
-        duration=$(( SECONDS - start ))
-    done
-    
-    # destroy
-    echo -ne "\e[39m\033[2J\033[1;1f"
-    tput cnorm
-}
-
-# S P A G E T
-msg_anim 'emerge-webrsync' 'The first thing we have to do is emerge-webrsync.' '5'
-msg_anim 'emerge-webrsync' 'This ensures that our portage profile is valid and up' '5'
-msg_anim 'emerge-webrsync' '...to date!' '5'
-
 emerge-webrsync
 env-update
 
 sleep 5s
-
-msg_anim 'Configure the Timezone' 'Using my injected config, along with an...' '5'
-msg_anim 'Configure the Timezone' '...emerge --config sys-libs/timezone-data to update...' '5'
-msg_anim 'Configure the Timezone' '...the system clock.' '5'
 
 emerge --config sys-libs/timezone-data
 locale-gen
 
 sleep 5s
 
-msg_anim 'Compile Kernel' 'We first have to emerge the kernel sources...' '5'
-
 # send nudes
 emerge =sys-kernel/linux-headers-5.1::gentoo =sys-kernel/ck-sources-5.1.7::gentoo
 
 sleep 5s
-
-msg_anim 'Compile Kernel' 'Now lets compile!' '5'
 
 cd /usr/src/linux
 make clean && make mrproper
@@ -6415,19 +6245,9 @@ cd ~
 
 sleep 5s
 
-msg_anim 'Mount efivars' 'To compile the initramfs, we will need access to...' '5'
-msg_anim 'Mount efivars' '...efivars.  I have injected it into the fstab, so' '5'
-msg_anim 'Mount efivars' 'simply remounting it will work.' '5'
-
 umount -v efivarfs && mount -v efivarfs 
 
 sleep 5s
-
-msg_anim 'Emerge initramfs dependences' 'This will take a while!' '5'
-msg_anim 'Emerge initramfs dependences' 'we are also going to emerge sys-boot/grub:2' '5'
-msg_anim 'Emerge initramfs dependences' 'This also incidentally means we need to emerge' '5'
-msg_anim 'Emerge initramfs dependences' 'the nvidia drivers to compile dracut with the module' '5'
-msg_anim 'Emerge initramfs dependences' 'needed to modeset my graphics card with X.' '5'
 
 # poop
 emerge dracut lvm2 sys-kernel/linux-firmware sys-firmware/intel-microcode sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-fs/udisks sys-auth/polkit x11-drivers/nvidia-drivers
@@ -6436,23 +6256,9 @@ env-update
 sleep 5s
 
 # farts
-msg_anim 'Compile initramfs' 'Lets use dracut to make a custom initramfs that loads...' '5'
-msg_anim 'Compile initramfs' '...everything my system needs to boot correctly into the kernel...' '5'
-msg_anim 'Compile initramfs' '...during boot.  This ensures I dont have to mess with anything like...' '5'
-msg_anim 'Compile initramfs' '...dkms.  Booting with dracut is a lot more secure, and works...' '5'
-msg_anim 'Compile initramfs' '...independantly of your bootloaders compatibility.' '5'
-msg_anim 'Dracut Drawbacks' 'Booting with dracut does have a few downsides.' '5'
-msg_anim 'Dracut Drawbacks' '1.  Your boot may be a bit slower as it ensures all of your devices are up...' '5'
-msg_anim 'Dracut Drawbacks' '...and working correctly before spawning OpenRC on the root block.' '5'
-msg_anim 'Dracut Drawbacks' '2.  Its not easy.  If you are a beginner, custom initramfs is not...' '5'
-msg_anim 'Dracut Drawbacks' '...a task to be undertaken lightly.' '5'
 dracut --kver 5.1.7-ck -H --add "lvm dm" --add-drivers "efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci" --hostonly-cmdline --fstab --gzip --lvmconf --force /boot/initramfs-5.1.7-ck.img
 
 sleep 5s
-
-msg_anim 'Install Grub' 'I need to install grub 2 next.  Its pretty simple...' '5'
-msg_anim 'Install Grub' 'to do, I just use my nvme device at /dev/nvme0n1...' '5'
-msg_anim 'Install Grub' 'targetting x86_64-efi with the --no-floppy flag.' '5'
 
 cat <<'EOFDOC' > /etc/default/grub
 GRUB_DISTRIBUTOR="Gentoo"
@@ -6465,69 +6271,33 @@ grub-mkconfig -o /boot/grub/grub.cfg
 sleep 5s
  
 # *mouth noises*
-msg_anim 'Portage Extensions' 'Portage comes with some very useful utilities Ill need...' '5'
-msg_anim 'Portage Extensions' '...down the road.  Like eix and pquery.  so may as well..' '5'
-msg_anim 'Portage Extensions' '...get them all emerged up.' '5'
-
 emerge app-portage/eix app-portage/gentoolkit app-portage/genlop app-portage/portage-utils app-portage/layman 
 
 sleep 5s
  
 # tune it to eb like your moms [ BOOP ] and shove it somewhere.
-
-msg_anim 'Install X Server' 'X Server is a daemon for displaying computer graphics.' '5'
-msg_anim 'Install X Server' 'It is the basis of all gui on Linux.  It is a direct...' '5'
-msg_anim 'Install X Server' '...interface between your computers graphics hardware and...' '5'
-msg_anim 'Install X Server' '...the software in a Linux system which displays graphics on...' '5'
-msg_anim 'Install X Server' '...your screen.' '5'
-
 emerge x11-base/xorg-drivers x11-base/xorg-server x11-apps/xinit app-arch/unrar
 
 sleep 5s
 
 # hes op plz nerf
-
-msg_anim 'Nvidia configuration' 'nvidia-xconfig is run here to set up my graphics device...' '5'
-msg_anim 'Nvidia configuration' '...with X Server.  I also set opengl to prefer the nvidia...' '5'
-msg_anim 'Nvidia configuration' '...driver to enable hardware acceleration for opengl.' '5'
-
 nvidia-xconfig
 eselect opengl set nvidia
 
 sleep 5s
 
 # setup system services
-msg_anim 'System Services Install' 'Need to emerge some packages to enable system logging,...' '5'
-msg_anim 'System Services Install' '...scheduled tasks, file indexing, and to rotate/prune...' '5'
-msg_anim 'System Services Install' '...the system logs automatically.' '5'
-
 emerge sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate 
 
 sleep 5s
 
 # Emerge KDE Plasma 5
-msg_anim 'KDE Plasma 5' 'How exciting!  A graphical environment.  Weve made it this far.' '5'
-msg_anim 'Shameless Plug' 'Im surprised you have been watching this long.  Good for you.' '5'
-msg_anim 'Shameless Plug' 'Hit that like and subscribe button for me!' '5'
-msg_anim 'KDE Plasma 5' 'Anyway, lets get KDE plasma installed.  We simply select the' '5'
-msg_anim 'KDE Plasma 5' '...profile for plasma, and then emerge the world.' '5'
-msg_anim 'System Profile Note' 'We need to pre-prepare the system with the correct' '5'
-msg_anim 'System Profile Note' 'profile.  THEN we can compile from the kde ebuild repo.' '5'
-
 # saying the zeeky words causes a nuclear explosion.
 eselect profile set 23
 layman --fetch --add kde
 emerge -uDU --keep-going --with-bdeps=y @world
-sleep 5s
 
-msg_anim 'KDE Plasma ebuild repository' 'Installing kde ebuild repository tags with the configurations' '5'
-msg_anim 'KDE Plasma ebuild repository' 'ijected by my script next.' '5'
-msg_anim 'Display Manager Notes' 'Im using sddm (I will not be using...' '5'
-msg_anim 'Display Manager Notes' 'multiseat sessions)  lightdm may be better if you want' '5'
-msg_anim 'Display Manager Notes' 'to be letting someone else use your computer while you' '5'
-msg_anim 'Display Manager Notes' 'are logged in.' '5'
-msg_anim 'KDE Settings Classic' 'This part of the script also enables' '5'
-msg_anim 'KDE Settings Classic' 'the classic tree view in systemsettings Im used to.' '5'
+sleep 5s
 
 emerge x11-misc/sddm acpi acpid @kde-plasma @kde-frameworks @kdeutils
 
@@ -6593,19 +6363,6 @@ env-update
 
 sleep 5s
 
-msg_anim 'KDE Apps Bundle' 'The gentoo system includes the full KDE apps bundle as the' '5'
-msg_anim 'KDE Apps Bundle' 'kde-applications ebuild tag  Ill be installing' '5'
-msg_anim 'KDE Apps Bundle' 'that package plus a few extras for my desktop.' '5'
-msg_anim 'KWallet Security' 'The pam authentication extension to ssdm provides the ability' '5'
-msg_anim 'KWallet Security' 'to automatically unlock the KWallet password wallet when the' '5'
-msg_anim 'KWallet Security' 'user is logged in.  I enable that feature, too.' '5'
-msg_anim 'All of them?' 'Yes, everything from the stable branch is installed here.' '5'
-msg_anim 'All of them?' 'Here you thought we where done :-)' '5'
-msg_anim 'Air Conditioning' 'Need I mention my CPU has been getting quite a workout.' '5'
-msg_anim 'Air Conditioning' 'If you need to run an air conditioner in your space, please' '5'
-msg_anim 'Air Conditioning' 'dont forget to turn on the dehumidifier!' '5'
-msg_anim 'Zzzz...' 'This stage of the installation will take an additional hour.' '5'
-
 # i have an app for that
 # I HAVE THEM ALL.
 emerge @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
@@ -6613,18 +6370,12 @@ env-update
 
 sleep 5s
 
-msg_anim 'Zzzz...' 'Oh!  Ive woken.  Okay, uh...what wss I saying?' '5'
-msg_anim 'Greeter config' 'Ah, thats right, lets add sddm to our default runlevel...' '5'
-
 cat <<'EOFDOC' > /etc/conf.d/xdm
 DISPLAYMANAGER="sddm"
 EOFDOC
 usermod -a -G video sddm
 
 sleep 5s
-
-msg_anim 'User config' 'Last thing we need to do is make ourselves a user account.' '5'
-msg_anim 'User config' 'This will of course involve emerging sudo so lets do that.' '5'
 
 emerge app-admin/sudo net-misc/x11-ssh-askpass
 
@@ -6731,19 +6482,12 @@ EOFDOC
 sleep 5s
 
 # i gained weight
-msg_anim 'User config' 'Now we add the user and create their home directory.' '5'
-
 useradd heavypaws -g users -G wheel,video,audio,root,sys,disk,adm,sddm,bin,daemon,tty,portage,console,plugdev,usb,cdrw,cdrom,input,lp,uucp -d /home/heavypaws -s /bin/bash 
 mkdir /home/heavypaws 
 cp -a /etc/skel/. /home/heavypaws/.
 chown -R heavypaws /home/heavypaws
 
 # chair farts
-msg_anim 'System Services Configuration' 'Now well configure multithreaded IO for the logger...' '5'
-msg_anim 'System Services Configuration' '..and then add all of the services to the default runlevel.' '5'
-msg_anim 'System Services Configuration' 'This ensures that OpenRC will spawn them at boot.' '5'
-msg_anim 'System Services Configuration' 'KDE-relevant services are also configured in this step.' '5'
-
 sed -i 's/threaded(yes)/threaded(no)/g' /etc/syslog-ng/syslog-ng.conf 
 rc-update add syslog-ng default 
 rc-update add cronie default
