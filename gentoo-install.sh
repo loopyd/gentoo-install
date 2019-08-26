@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# i'm sorry, someone forgot to administer my medication during the writing of this script
+# she should be in here shortl-  *poke*  ahh...  sweet, sweet bliss.
+
+# have an ascii starfield  a really half ass one i wrote while drunk.
 display_center(){
     local x
     local y
@@ -111,6 +115,7 @@ msg_anim 'This script is very long' 'Sit back, relax, and enjoy!' '10'
 
 msg_anim 'Unmount existing partitions' 'For safety...' '5'
 
+# pre-unmount, gotta climb off him first.
 swapoff /dev/mapper/gentoo-swap
 umount -l /mnt/gentoo/sys
 umount -l /mnt/gentoo/proc
@@ -125,22 +130,25 @@ umount -l /mnt/gentoo/tmp
 umount -l /mnt/gentoo/home
 umount -l /mnt/gentoo
 
+# delet this
 lvremove -f gentoo
 vgremove -f gentoo /dev/nvme0n1p2
 pvremove -f /dev/nvme0n1p2
 rm -rd /mnt/gentoo
+wipefs -af /dev/nvme0n1
 
 sleep 5s
 
 msg_anim 'Create filesystem' 'I need to make and format a filesystem' '5'
 msg_anim 'Create filesystem' 'I will be using LVM with a single EFI partition' '5'
 
-wipefs -af /dev/nvme0n1
+# ssskskskskskskskskksskksksksksskkskksdisk
 sgdisk -ozg /dev/nvme0n1
 sgdisk -n 1:2048:+500M -c 1:"EFI System Partition" -t 1:ef00 /dev/nvme0n1
 sgdisk -n 2 -c 2:"Linux LVM" -t 2:8e00 /dev/nvme0n1
 partprobe
 
+# nothing about this is logical
 pvcreate /dev/nvme0n1p2
 vgcreate -f gentoo /dev/nvme0n1p2
 lvcreate -y -L 4G -n swap gentoo
@@ -148,6 +156,7 @@ lvcreate -y -L 4G -n var_log gentoo
 lvcreate -y -l50%FREE -n linux_root gentoo
 lvcreate -y -l100%FREE -n linux_home gentoo
 
+# hey pat, i'd like to buy a vfat?
 mkfs.vfat -F32 /dev/nvme0n1p1
 mkfs.xfs -f /dev/mapper/gentoo-linux_root
 mkfs.ext4 -F /dev/mapper/gentoo-linux_home
@@ -161,6 +170,7 @@ msg_anim 'Mount filesystem' 'Need to mount the base gentoo filesystem.' '5'
 msg_anim 'Mount filesystem' 'The root filesystem comes first, followed by...' '5'
 msg_anim 'Mount filesystem' 'all of the others.' '5'
 
+# poop
 mkdir /mnt/gentoo
 mount --types xfs --options rw,noatime,attr2,inode64,noquota /dev/mapper/gentoo-linux_root /mnt/gentoo
 mkdir --parents /mnt/gentoo/proc /mnt/gentoo/sys /mnt/gentoo/dev /mnt/gentoo/dev/shm /mnt/gentoo/dev/pts /mnt/gentoo/var/tmp/portage /mnt/gentoo/var/log /mnt/gentoo/boot/efi /mnt/gentoo/tmp /mnt/gentoo/root /mnt/gentoo/home /mnt/gentoo/run
@@ -178,11 +188,13 @@ msg_anim 'Stage 3 Download' 'You could emerge -aV wget here and grab the files d
 msg_anim 'Stage 3 Download' 'if you wanted to.' '5'
 
 cd /mnt/gentoo/root/
+# hey kids this is my ip address ugu.
 links 'http://192.168.1.103'
 
 msg_anim 'Stage 3 Install' 'Lets extract the tarballs.  I have enabled the v flag...' '5'
 msg_anim 'Stage 3 Install' '...for funsies.' '5'
 
+# daddy that hurts....
 tar xvpf /mnt/gentoo/root/$(ls | grep 'stage3') --xattrs-include='*.*' --numeric-owner -C /mnt/gentoo
 tar xvpf /mnt/gentoo/root/$(ls | grep 'portage') --xattrs-include='*.*'--numeric-owner -C /mnt/gentoo/usr
 
@@ -196,6 +208,7 @@ msg_anim 'Mount filesystem' 'This script also mounts /var/tmp/portage to tmpfs i
 msg_anim 'Mount filesystem' '...fstab configuration file permenantly.' '5'
 msg_anim 'Mount filesystem' 'You can speed up compile time on desktops by doing this.' '5'
 
+# there once was a bug here.  he was squashed.  i use cleanex, it was kosher.
 mount --rbind /proc /mnt/gentoo/proc
 mount --make-rslave /mnt/gentoo/proc
 mount --rbind /sys /mnt/gentoo/sys
@@ -233,7 +246,7 @@ msg_anim 'Lets Configure' 'Alright, lets do this!' '5'
 
 sed -i -e 's/^root:\*/root:/' /mnt/gentoo/etc/shadow
 
-# Timezone and locale configuration
+# B U R G E R L A N D
 echo 'Injecting locale configuration for en_US...'
 cat <<'EOF' >> /mnt/gentoo/etc/locale.gen
 en_US ISO-8859-1
@@ -250,7 +263,7 @@ cat <<'EOF' > /mnt/gentoo/etc/timezone
 America/New_York
 EOF
 
-# Network configuration
+# H A P P Y L A N D 
 echo 'Injecting network configuration...'
 cat <<'EOF' > /mnt/gentoo/etc/hosts
 127.0.0.1   heavypaws-pc.localdomain heavypaws-pc localhost
@@ -287,7 +300,7 @@ msg_anim 'Live media tweaks' 'to run.  The live medias portage installation is a
 msg_anim 'Live media tweaks' 'modified slightly for the automake conf portion of the demo' '5'
 msg_anim 'Live media tweaks' 'which tailors make.conf automatically for the system.' '5'
 
-# Portage configuration
+# Portage sounds like an orafice you can-....  nevermind.
 echo 'Cleaning out portage directories...'
 rm -f /mnt/gentoo/etc/portage/package.mask >/dev/null 2>&1
 rm -fdr /mnt/gentoo/etc/portage/package.mask >/dev/null 2>&1
@@ -307,7 +320,7 @@ mkdir --parents /mnt/gentoo/var/db/repos/gentoo >/dev/null 2>&1
 echo 'Copying portage repo configuration...'
 cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
 
-## INJECT HEREDOCUMENTS ##
+## INJECT ME DAD ##
 
 #-- fixes for portage --#
 echo 'Copying portage package configuration...'
@@ -324,7 +337,7 @@ cat <<'EOF' > /mnt/gentoo/etc/portage/package.accept_keywords/zq-pidgin-indicato
 =x11-plugins/pidgin-indicator-1.0 ~amd64
 EOF
 
-cat <<'EOF' > /mnt/gentoo/portage/package.license/zs-kde
+cat <<'EOF' > /mnt/gentoo/etc/portage/package.license/zs-kde
 >=media-libs/faac-1.29.9.2 MPEG-4
 =net-misc/dropbox-48.3.56 CC-BY-ND-3.0 dropbox
 EOF
@@ -767,6 +780,7 @@ GRUB_PLATFORM="efi-64"
 
 EOF
 
+# barf citaaaay, barf citaaaay, BARF CITeeeeeeEEE!  *vomit compilation 9*
 echo "Autogenerating make.conf..."
 echo 'Setting MAKEOPTS...'
 perl -pi -e 's|(MAKEOPTS\=\")(.*)(")|${1}-j'$(perl -e'use POSIX; print ceil('$(nproc --all)'*0.5);')' -l'$(perl -e'use POSIX; print floor('$(nproc --all)'*0.9);')'${3}|g;' /mnt/gentoo/etc/portage/make.conf
@@ -778,7 +792,8 @@ cmd='s|(CPU\_FLAGS\_X86\=\")(.*)(")|${1}'$(cpuid2cpuflags | cut -d' ' -f 2-)'${3
 echo 'Setting GENTOO_MIRRORS...'
 cmd='s|(GENTOO\_MIRRORS\=\")(.*)(")|${1}'$(mirrorselect -b50 -s3 -R 'North America' -q -o 2>/dev/null | perl -p -e 's|(GENTOO\_MIRRORS\=\")(.*)(")|${2}|g' | awk '{printf $0}')'${3}|g'; perl -pi -e "$cmd" /mnt/gentoo/etc/portage/make.conf
 
-# FsTab
+# bug #2 with the home partition was here.  a cleanex rests in his place.
+# f for the innocent bugs who died as a result of making this script.
 echo 'Copying fstab...'
 cat <<'EOF' > /etc/fstab
 /dev/nvme0n1p1                      /boot/efi        vfat              noatime                                                                             0 2
@@ -798,6 +813,7 @@ msg_anim 'Chroot' 'The next stage of the installer runs in the chroot.' '5'
 msg_anim 'Chroot' 'My script auto-injects this.  Dont worry, commentary...' '5'
 msg_anim 'Chroot' '...continues within the chroot.  :-)' '5'
 
+#- PUT IT INSIDE ME -#
 cat <<'INNERSCRIPT' >/mnt/gentoo/root/chroot_inner_script.sh
 #!/bin/bash
 
@@ -911,7 +927,7 @@ function msg_anim() {
     tput cnorm
 }
 
-# emerge rsync to fix the portage profile.
+# S P A G E T
 msg_anim 'emerge-webrsync' 'The first thing we have to do is emerge-webrsync.' '5'
 msg_anim 'emerge-webrsync' 'This ensures that our portage profile is valid and up' '5'
 msg_anim 'emerge-webrsync' '...to date!' '5'
@@ -932,7 +948,7 @@ sleep 5s
 
 msg_anim 'Compile Kernel' 'We first have to emerge the kernel sources...' '5'
 
-# compile/install kernel
+# send nudes
 emerge =sys-kernel/linux-headers-5.1::gentoo =sys-kernel/ck-sources-5.1.7::gentoo
 
 sleep 5s
@@ -6413,14 +6429,13 @@ msg_anim 'Emerge initramfs dependences' 'This also incidentally means we need to
 msg_anim 'Emerge initramfs dependences' 'the nvidia drivers to compile dracut with the module' '5'
 msg_anim 'Emerge initramfs dependences' 'needed to modeset my graphics card with X.' '5'
 
-# Install initramfs, grub packages.
+# poop
 emerge dracut lvm2 sys-kernel/linux-firmware sys-firmware/intel-microcode sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-fs/udisks sys-auth/polkit x11-drivers/nvidia-drivers
 env-update
 
 sleep 5s
 
-# Install initramfs and grub
-
+# farts
 msg_anim 'Compile initramfs' 'Lets use dracut to make a custom initramfs that loads...' '5'
 msg_anim 'Compile initramfs' '...everything my system needs to boot correctly into the kernel...' '5'
 msg_anim 'Compile initramfs' '...during boot.  This ensures I dont have to mess with anything like...' '5'
@@ -6449,7 +6464,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 sleep 5s
  
- # Install portage utilities
+# *mouth noises*
 msg_anim 'Portage Extensions' 'Portage comes with some very useful utilities Ill need...' '5'
 msg_anim 'Portage Extensions' '...down the road.  Like eix and pquery.  so may as well..' '5'
 msg_anim 'Portage Extensions' '...get them all emerged up.' '5'
@@ -6458,7 +6473,7 @@ emerge app-portage/eix app-portage/gentoolkit app-portage/genlop app-portage/por
 
 sleep 5s
  
-# Configure X
+# tune it to eb like your moms [ BOOP ] and shove it somewhere.
 
 msg_anim 'Install X Server' 'X Server is a daemon for displaying computer graphics.' '5'
 msg_anim 'Install X Server' 'It is the basis of all gui on Linux.  It is a direct...' '5'
@@ -6470,7 +6485,7 @@ emerge x11-base/xorg-drivers x11-base/xorg-server x11-apps/xinit app-arch/unrar
 
 sleep 5s
 
-# Configure NVidia
+# hes op plz nerf
 
 msg_anim 'Nvidia configuration' 'nvidia-xconfig is run here to set up my graphics device...' '5'
 msg_anim 'Nvidia configuration' '...with X Server.  I also set opengl to prefer the nvidia...' '5'
@@ -6499,6 +6514,7 @@ msg_anim 'KDE Plasma 5' '...profile for plasma, and then emerge the world.' '5'
 msg_anim 'System Profile Note' 'We need to pre-prepare the system with the correct' '5'
 msg_anim 'System Profile Note' 'profile.  THEN we can compile from the kde ebuild repo.' '5'
 
+# saying the zeeky words causes a nuclear explosion.
 eselect profile set 23
 layman --fetch --add kde
 emerge -uDU --keep-going --with-bdeps=y @world
@@ -6590,7 +6606,8 @@ msg_anim 'Air Conditioning' 'If you need to run an air conditioner in your space
 msg_anim 'Air Conditioning' 'dont forget to turn on the dehumidifier!' '5'
 msg_anim 'Zzzz...' 'This stage of the installation will take an additional hour.' '5'
 
-# apps
+# i have an app for that
+# I HAVE THEM ALL.
 emerge @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
 env-update
 
@@ -6713,6 +6730,7 @@ EOFDOC
 
 sleep 5s
 
+# i gained weight
 msg_anim 'User config' 'Now we add the user and create their home directory.' '5'
 
 useradd heavypaws -g users -G wheel,video,audio,root,sys,disk,adm,sddm,bin,daemon,tty,portage,console,plugdev,usb,cdrw,cdrom,input,lp,uucp -d /home/heavypaws -s /bin/bash 
@@ -6720,6 +6738,7 @@ mkdir /home/heavypaws
 cp -a /etc/skel/. /home/heavypaws/.
 chown -R heavypaws /home/heavypaws
 
+# chair farts
 msg_anim 'System Services Configuration' 'Now well configure multithreaded IO for the logger...' '5'
 msg_anim 'System Services Configuration' '..and then add all of the services to the default runlevel.' '5'
 msg_anim 'System Services Configuration' 'This ensures that OpenRC will spawn them at boot.' '5'
@@ -6738,6 +6757,7 @@ rc-update add xdm default
 
 INNERSCRIPT
 
+#- this is nsfw -#
 chmod +x /mnt/gentoo/root/chroot_inner_script.sh
 chroot /mnt/gentoo/ /bin/bash /root/chroot_inner_script.sh
 
@@ -6749,6 +6769,7 @@ msg_anim 'Reboot' 'Lets just unmount all of our partitions, first.' '5'
 rm -f /mnt/gentoo/root/*.xz
 rm -f /mnt/gentoo/root/*.sh
 
+# he's done so unmount him.  careful now.
 umount -l /mnt/gentoo/sys
 umount -l /mnt/gentoo/proc
 umount /mnt/gentoo/dev/pts
@@ -6764,6 +6785,7 @@ umount -l /mnt/gentoo
 
 sleep 5s
 
+# love
 msg_anim 'Final Words' 'The source code for this script is available in the description.' '5'
 msg_anim 'Final Words' 'Its designed for my machine, but I hope that it can be a guide...' '5'
 msg_anim 'Final Words' '...for those of you open source enthusiests out there.' '5'
@@ -6777,3 +6799,6 @@ msg_anim 'Greetz' 'baxter | hunter | jelly | alek' '2'
 msg_anim 'Greetz' 'adri | november | shadow | soren' '2'
 msg_anim 'Greetz' '... and you! ...' '5'
 msg_anim 'Thank You' '... Thanks for Watching! ...' '5'
+
+# and then everyone died THE END
+# *cheers*
