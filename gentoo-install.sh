@@ -466,7 +466,7 @@ echo 'Setting GENTOO_MIRRORS...'
 cmd='s|(GENTOO\_MIRRORS\=\")(.*)(")|${1}'$(mirrorselect -b50 -s3 -R 'North America' -q -o 2>/dev/null | perl -p -e 's|(GENTOO\_MIRRORS\=\")(.*)(")|${2}|g' | awk '{printf $0}')'${3}|g'; perl -pi -e "$cmd" /mnt/gentoo/etc/portage/make.conf
 
 echo 'Copying fstab...'
-cat <<'EOF' > /etc/fstab
+cat <<'EOF' > /mnt/gentoo/etc/fstab
 /dev/nvme0n1p1                      /boot/efi        vfat              noatime                                                                             0 2
 /dev/mapper/gentoo-swap             none             swap              sw                                                                                  0 0
 /dev/mapper/gentoo-linux_root       /                xfs               rw,noatime,attr2,inode64,noquota                                                    0 1
@@ -5964,7 +5964,7 @@ env-update
 dracut --kver 5.1.7-ck -H --add "lvm dm" --add-drivers "efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci" --hostonly-cmdline --fstab --gzip --lvmconf --force /boot/initramfs-5.1.7-ck.img
 cat <<'EOFDOC' > /etc/default/grub
 GRUB_DISTRIBUTOR="Gentoo"
-GRUB_CMDLINE_LINUX="rd.auto=1"#
+GRUB_CMDLINE_LINUX="rd.auto=1"
 EOFDOC
 grub-install /dev/nvme0n1 --efi-directory=/boot/efi --target=x86_64-efi --no-floppy
 grub-mkconfig -o /boot/grub/grub.cfg
