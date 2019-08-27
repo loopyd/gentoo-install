@@ -1,9 +1,55 @@
 #!/bin/bash
 
-# i'm sorry, someone forgot to administer my medication during the writing of this script
-# she should be in here shortl-  *poke*  ahh...  sweet, sweet bliss.
-
-# have an ascii starfield  a really half ass one i wrote while drunk.
+# The Linux Distro personality blurb:
+# "Gentoo - Sad neckbeards who don't talk to people IRL and don't have a girlfriend."
+#
+# I'm a flamin gay dad, I guess he's right in some way.  Hold my beer before you
+# scroll on down.  This script is a doozy.  It was compiled from several different
+# videos, into one big spaghetti mess that somehow turns up a working system after
+# 3 months of reseach, intense masturbation, and discarded coke bottles full of
+# piss.  My dog hates me because of you people.
+#
+# Have fun.  This wasn't designed for your machine, here are the relevant
+# find+replace strings and things you should give a shit about, instead of my
+# pisspickle jars.
+#
+# /dev/nvme0n1p1                   boot/efi partition
+# /boot/efi                        who in the fuck uses BIOS nowadays?
+# /dev/nvme0n1p2                   LVM partition
+# /dev/nvme0n1                     base device path of install (replace it /dev/sda...)
+# /mnt/gentoo                      replace this string to configure your chroot point
+# /dev/mapper/gentoo-linux_home	   replace these to config lvm partitions
+# /dev/mapper/gentoo-linux_root
+# /dev/mapper/gentoo-swap
+# /dev/mapper/gentoo-var_log
+# xfs							the root's filesystems
+# ext4							the home partition and the var/log filesystems
+# vfat                         if you search for this, you'll get bootloader/efi stuff
+# sgdisk                       if you search for this, you'll find your partiton commands
+# grub-install                    the bootloader of love
+# lvm                             the lvm of love
+#
+#               USE MY USE FLAGS - THEY'RE HERE FOR YOUR SATISFACTION
+#
+# package.use                  shouldn't mess with these too much, unless you want
+# package.license              to pout in your own packages.  this system is configured
+# package.accept_keywords      for kde plasma, so have at if you want something else
+#
+#                 DON'T SEARCH UP THIS LIST UNLESS YOU LIKE IT KINKY
+#
+# dracut                       Oh~  Changing the initramfs are we?
+# ck-sources                   You're a naughty one
+# linux-ck                     Whose a good boy?
+# .cofig                       send me an email, you dirty bastard~
+#
+# Got all that, good.  Hold on to your butts.  pLEASE sECURE aLL lOoSE ObJeCtS .
+#
+# - Love
+#      Papa Paws
+#
+ 
+# have an ascii starfield  a really half ass one i wrote while drunk.  it looked good
+# while i was drinking, now i'm sober and it has problems.  have at.
 display_center(){
     local x
     local y
@@ -33,7 +79,7 @@ function msg_anim() {
 
     # 2D Starfield Script by Me!
     
-    # init
+    # dicks
     tput civis
     RANDOM=$$$(date +%s)
     STARCHARS='.+*X'
@@ -113,6 +159,7 @@ function msg_anim() {
 msg_anim 'Welcome to the installer!' 'This took about 3 months to write' '5'
 msg_anim 'This script is very long' 'Sit back, relax, and enjoy!' '10'
 
+#- Unmount for safety -#
 clear
 swapoff /dev/mapper/gentoo-swap
 umount -l /mnt/gentoo/sys 
@@ -134,6 +181,7 @@ pvremove -f /dev/nvme0n1p2
 rm -rd /mnt/gentoo
 wipefs -af /dev/nvme0n1
 
+#- *formatting noises* -#
 sgdisk -ozg /dev/nvme0n1
 sgdisk -n 1:2048:+500M -c 1:"EFI System Partition" -t 1:ef00 /dev/nvme0n1
 sgdisk -n 2 -c 2:"Linux LVM" -t 2:8e00 /dev/nvme0n1
@@ -153,6 +201,7 @@ mkfs.ext4 -F /dev/mapper/gentoo-var_log
 mkswap -f /dev/mapper/gentoo-swap
 swapon /dev/mapper/gentoo-swap
 
+#- MOUNT ME DAD! -#
 mkdir /mnt/gentoo
 mount --types xfs --options rw,noatime,attr2,inode64,noquota /dev/mapper/gentoo-linux_root /mnt/gentoo
 mkdir --parents /mnt/gentoo/proc /mnt/gentoo/sys /mnt/gentoo/dev /mnt/gentoo/dev/shm /mnt/gentoo/dev/pts /mnt/gentoo/var/tmp/portage /mnt/gentoo/var/log /mnt/gentoo/boot/efi /mnt/gentoo/tmp /mnt/gentoo/root /mnt/gentoo/home /mnt/gentoo/run
@@ -161,12 +210,14 @@ mount --types vfat --options rw,noatime /dev/nvme0n1p1 /mnt/gentoo/boot/efi
 mount --types ext4 --options rw,noatime /dev/mapper/gentoo-var_log /mnt/gentoo/var/log
 
 cd /mnt/gentoo/root/
-# hey kids this is my ip address ugu.
+# hey kids this is my ip address uwu
+# set this to a private http server somewhere  it should have your tarballs on it, in any case.
 links 'http://192.168.1.103'
 
 tar xvpf /mnt/gentoo/root/$(ls | grep 'stage3') --xattrs-include='*.*' --numeric-owner -C /mnt/gentoo
 tar xvpf /mnt/gentoo/root/$(ls | grep 'portage') --xattrs-include='*.*'--numeric-owner -C /mnt/gentoo/usr
 
+#- Kinky~ -#
 mount --rbind /proc /mnt/gentoo/proc
 mount --make-rslave /mnt/gentoo/proc
 mount --rbind /sys /mnt/gentoo/sys
@@ -181,6 +232,9 @@ mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=755,size=16G,uid=port
 
 echo 'Patching root password for chroot...'
 sed -i -e 's/^root:\*/root:/' /mnt/gentoo/etc/shadow
+
+#- CONFIGULATOR! -#
+# I'll config you later~
 echo 'Injecting locale configuration for en_US...'
 cat <<'EOF' >> /mnt/gentoo/etc/locale.gen
 en_US ISO-8859-1
@@ -227,6 +281,7 @@ ln -s net.lo net.enp10s0
 ln -s net.lo net.enp0s31f6
 cd ~
 
+#- PORTAGE JUNK IN THE BIG PAW'S TRUNK -#
 # Portage sounds like an orafice you can-....  nevermind.
 echo 'Cleaning out portage directories...'
 rm -f /mnt/gentoo/etc/portage/package.mask >/dev/null 2>&1
@@ -246,8 +301,6 @@ mkdir --parents /mnt/gentoo/var/db/repos/gentoo >/dev/null 2>&1
 
 echo 'Copying portage repo configuration...'
 cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
-
-## INJECT ME DAD ##
 
 #-- fixes for portage --#
 echo 'Copying portage package configuration...'
@@ -333,7 +386,14 @@ cat <<'EOF' > /mnt/gentoo/etc/portage/package.use/zx-grub-2
 >=sys-boot/grub-2.02-r4 mount device-mapper fonts theme truetype
 EOF
 
-#-- make.conf --#
+#- AUTO MAKE CONFIGULATOR! -#
+#
+# If you want my ascii puke to autoconfig some things, you can have it
+# I'm not interested in my own vomit but its yours if you want.
+#
+# I scare the shit out of people on discord with this.  Its good for
+# october.
+#
 echo 'Emerging cpuinfo2cpuflags and mirrorselect for make.conf autoconfiguration...'
 emerge --sync
 cat <<'EOFDOC' > /etc/portage/package.use/use
@@ -454,6 +514,9 @@ GRUB_PLATFORM="efi-64"
 
 EOF
 
+#- THE NEXT MORNING -#
+# Painting the garage door!
+#
 echo "Autogenerating make.conf..."
 echo 'Setting MAKEOPTS...'
 perl -pi -e 's|(MAKEOPTS\=\")(.*)(")|${1}-j'$(perl -e'use POSIX; print ceil('$(nproc --all)'*0.5);')' -l'$(perl -e'use POSIX; print floor('$(nproc --all)'*0.9);')'${3}|g;' /mnt/gentoo/etc/portage/make.conf
@@ -465,6 +528,9 @@ cmd='s|(CPU\_FLAGS\_X86\=\")(.*)(")|${1}'$(cpuid2cpuflags | cut -d' ' -f 2-)'${3
 echo 'Setting GENTOO_MIRRORS...'
 cmd='s|(GENTOO\_MIRRORS\=\")(.*)(")|${1}'$(mirrorselect -b50 -s3 -R 'North America' -q -o 2>/dev/null | perl -p -e 's|(GENTOO\_MIRRORS\=\")(.*)(")|${2}|g' | awk '{printf $0}')'${3}|g'; perl -pi -e "$cmd" /mnt/gentoo/etc/portage/make.conf
 
+#- Fstab -#
+# Put the knife down, dave!
+#
 echo 'Copying fstab...'
 cat <<'EOF' > /mnt/gentoo/etc/fstab
 /dev/nvme0n1p1                      /boot/efi        vfat              noatime                                                                             0 2
@@ -484,6 +550,9 @@ msg_anim 'Chroot' 'The UI portion of the script will continue when that stage' '
 msg_anim 'Chroot' 'is reached' '5'
 
 #- PUT IT INSIDE ME -#
+# Its dark down here.  Notepad++ syntax highlighting fucks itself over here documents
+# Its why I had the most trouble with the chroot junk.
+#
 cat <<'INNERSCRIPT' >/mnt/gentoo/root/chroot_inner_script.sh
 #!/bin/bash
 
@@ -495,13 +564,38 @@ emerge-webrsync
 env-update
 emerge app-crypt/openpgp-keys-gentoo-release
 
+#- LOCALE/TIME ZONE -#
+# This doesn't completely fix emerge --sync.  Kindly never use emerge --sync.
+# It stopped working December 2015 due to a critical bug dealing with hkdps
+# links becoming deprecated by many of the mirrors.  Use emerge-webrsync
+# like a good boy.
+#
 emerge --config sys-libs/timezone-data
 locale-gen
 
+#- THE KINKY BITS -#
+# The pajamas are comin' off!
 emerge =sys-kernel/linux-headers-5.1::gentoo =sys-kernel/ck-sources-5.1.7::gentoo
 
 cd /usr/src/linux
 make clean && make mrproper
+
+#- KERNEL CONFIG -#
+# Only masters need apply here
+#
+# Want a pro-tip? ctrl+c when you see the kernel compiling.  Run back into the
+# chroot and configure it yourself, then copy it back here with WinSCP.  This
+# was my life for about a month until my kernel worked, so here's the wisdom.
+#
+# rc-service sshd start
+# passwd
+# chroot /mnt/gentoo /bin/bash
+#
+# You'll have to run the whole script again, but its your script now, right?
+#
+# You're welcome.  Also you're welcome for having to hit the Page Down key
+# a whole lot.  :v
+#
 cat <<'EOFDOC' > /usr/src/linux/.config
 # Automatically generated file; DO NOT EDIT.
 # Linux/x86 5.1.7-ck Kernel Configuration
@@ -5957,11 +6051,18 @@ make -j8
 make modules_install
 make install
 cd ~
+
+# This helps.  Its a recommended part of this.  Like lube.  You know.
+# Gotta prepare, get it all nice and-
 umount -v efivarfs && mount -v efivarfs 
 
+#- INITRAMFS -#
 emerge dracut lvm2 sys-kernel/linux-firmware sys-firmware/intel-microcode sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-fs/udisks sys-auth/polkit sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate acpi acpid x11-drivers/nvidia-drivers
 env-update
 dracut --kver 5.1.7-ck -H --add "lvm dm" --add-drivers "efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci" --hostonly-cmdline --fstab --gzip --lvmconf --force /boot/initramfs-5.1.7-ck.img
+
+#- GRUB -#
+# Scrub-a-dub-grub
 cat <<'EOFDOC' > /etc/default/grub
 GRUB_DISTRIBUTOR="Gentoo"
 GRUB_CMDLINE_LINUX="rd.auto=1"
@@ -5969,15 +6070,23 @@ EOFDOC
 grub-install /dev/nvme0n1 --efi-directory=/boot/efi --target=x86_64-efi --no-floppy
 grub-mkconfig -o /boot/grub/grub.cfg
 
+#- PORTAGE SHIT -#
+# Its the good kind.  Useful portage tools.
 emerge app-portage/eix app-portage/gentoolkit app-portage/genlop app-portage/portage-utils app-portage/layman 
 
+#- IS IT XORG -#
+# Or is it ZORBG! What ever it is, we need it for the graphics, and a display manager to look pretty and junk
+# 
 emerge x11-base/xorg-drivers x11-base/xorg-server x11-apps/xinit app-arch/unrar x11-misc/sddm net-misc/x11-ssh-askpass
 nvidia-xconfig
 eselect opengl set nvidia
 
+#- THIS PART SUCKS -#
+# Its the reason the script takes 9 hours.  Emerge KDE, don't shit yourself, okay?
+# Get up and move around if ya need to.  Beat off to my videos.  Or somethin...
+#
 eselect profile set 23
 layman --fetch --add kde
-emerge --sync
 emerge @kde-plasma @kde-frameworks @kdeutils
 emerge --changed-use kde-plasma/systemsettings
 emerge @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
@@ -6004,6 +6113,9 @@ cat <<'EOFDOC' > /etc/conf.d/xdm
 DISPLAYMANAGER="sddm"
 EOFDOC
 
+#- SUDO OFF, SUDO ON -#
+# Its like a flavor of martial arts or somethin
+#
 emerge app-admin/sudo
 
 cat <<'EOFDOC' > /etc/sudoers
@@ -6151,6 +6263,12 @@ destination console_all { file("/dev/tty12"); };
 log { source(src); destination(messages); };
 log { source(src); destination(console_all); };
 EOFDOC
+
+#- SERVICES -#
+# Without configuring these to start, we won't get past login
+# I went through a broken system's dmesg | grep for a little
+# while to get this list of needy, red headed stepchildren.
+#
 rc-update add syslog-ng default 
 rc-update add cronie default
 rc-update add net.enp10s0 default
@@ -6163,6 +6281,9 @@ rc-update add xdm default
 
 INNERSCRIPT
 
+#- SEX -#
+# Well we put it all in there.  Now we gotta go to town on it~
+#
 chmod +x /mnt/gentoo/root/chroot_inner_script.sh
 chroot /mnt/gentoo/ /bin/bash /root/chroot_inner_script.sh
 
@@ -6174,6 +6295,7 @@ msg_anim 'Reboot' 'Lets just unmount all of our partitions, first.' '5'
 rm -f /mnt/gentoo/root/*.xz
 rm -f /mnt/gentoo/root/*.sh
 
+#- HRRF~ -#
 # he's done so unmount him.  careful now.
 umount -l /mnt/gentoo/sys
 umount -l /mnt/gentoo/proc
@@ -6188,7 +6310,10 @@ umount -l /mnt/gentoo/tmp
 umount -l /mnt/gentoo/home
 umount -l /mnt/gentoo
 
-# love
+#- NAMES -#
+# Peopke that I love
+# You can delete all these, these messages where for the video
+# None of the names mean much, they've been shortened up or changed
 msg_anim 'Final Words' 'The source code for this script is available in the description.' '5'
 msg_anim 'Final Words' 'Its designed for my machine, but I hope that it can be a guide...' '5'
 msg_anim 'Final Words' '...for those of you open source enthusiests out there.' '5'
@@ -6200,8 +6325,17 @@ msg_anim 'Greetz' 'frost | caff | katelyn | rose' '2'
 msg_anim 'Greetz' 'aaron | burr | verag | tank  | lo' '2'
 msg_anim 'Greetz' 'baxter | hunter | jelly | alek' '2'
 msg_anim 'Greetz' 'adri | november | shadow | soren' '2'
+msg_anim 'Greetz' 'archaeous | alpho | vblast | vgm' '2'
+msg_anim 'Greetz' 'harvey | lo' '2'
+msg_anim 'Greetz' 'Music for this video provided by Lo.' '5'
 msg_anim 'Greetz' '... and you! ...' '5'
 msg_anim 'Thank You' '... Thanks for Watching! ...' '5'
 
-# and then everyone died THE END
-# *cheers*
+#- BED TIME STORY -#
+# We installed gentoo today.  There was a big mess to clean up.
+# The dogs where hungry.  The truck broke down, the mower needs fixed.
+# But we have Gentoo now.  We...have Gentoo.  Right?
+#
+# [ crickets ]
+#
+# Aaand everyone got turned into big macs !  The end!
