@@ -113,37 +113,32 @@ function msg_anim() {
 msg_anim 'Welcome to the installer!' 'This took about 3 months to write' '5'
 msg_anim 'This script is very long' 'Sit back, relax, and enjoy!' '10'
 
-# pre-unmount, gotta climb off him first.
+clear
 swapoff /dev/mapper/gentoo-swap
-umount -l /mnt/gentoo/sys
-umount -l /mnt/gentoo/proc
+umount -l /mnt/gentoo/sys 
+umount -l /mnt/gentoo/proc 
 umount /mnt/gentoo/dev/pts
-umount /mnt/gentoo/dev/shm
-umount -l /mnt/gentoo/dev
+umount /mnt/gentoo/dev/shm 
+umount -l /mnt/gentoo/dev 
 umount -l /mnt/gentoo/var/tmp/portage
 umount -l /mnt/gentoo/var/tmp
-umount -l /mnt/gentoo/var/log
+umount -l /mnt/gentoo/var/log 
 umount -l /mnt/gentoo/boot/efi
 umount -l /mnt/gentoo/tmp
 umount -l /mnt/gentoo/home
 umount -l /mnt/gentoo
 
-# delet this
 lvremove -f gentoo
 vgremove -f gentoo /dev/nvme0n1p2
 pvremove -f /dev/nvme0n1p2
 rm -rd /mnt/gentoo
 wipefs -af /dev/nvme0n1
 
-sleep 5s
-
-# ssskskskskskskskskksskksksksksskkskksdisk
 sgdisk -ozg /dev/nvme0n1
 sgdisk -n 1:2048:+500M -c 1:"EFI System Partition" -t 1:ef00 /dev/nvme0n1
 sgdisk -n 2 -c 2:"Linux LVM" -t 2:8e00 /dev/nvme0n1
 partprobe
 
-# nothing about this is logical
 pvcreate /dev/nvme0n1p2
 vgcreate -f gentoo /dev/nvme0n1p2
 lvcreate -y -L 4G -n swap gentoo
@@ -151,7 +146,6 @@ lvcreate -y -L 4G -n var_log gentoo
 lvcreate -y -l50%FREE -n linux_root gentoo
 lvcreate -y -l100%FREE -n linux_home gentoo
 
-# hey pat, i'd like to buy a vfat?
 mkfs.vfat -F32 /dev/nvme0n1p1
 mkfs.xfs -f /dev/mapper/gentoo-linux_root
 mkfs.ext4 -F /dev/mapper/gentoo-linux_home
@@ -159,9 +153,6 @@ mkfs.ext4 -F /dev/mapper/gentoo-var_log
 mkswap -f /dev/mapper/gentoo-swap
 swapon /dev/mapper/gentoo-swap
 
-sleep 5s
-
-# poop
 mkdir /mnt/gentoo
 mount --types xfs --options rw,noatime,attr2,inode64,noquota /dev/mapper/gentoo-linux_root /mnt/gentoo
 mkdir --parents /mnt/gentoo/proc /mnt/gentoo/sys /mnt/gentoo/dev /mnt/gentoo/dev/shm /mnt/gentoo/dev/pts /mnt/gentoo/var/tmp/portage /mnt/gentoo/var/log /mnt/gentoo/boot/efi /mnt/gentoo/tmp /mnt/gentoo/root /mnt/gentoo/home /mnt/gentoo/run
@@ -169,22 +160,13 @@ mount --types ext4 --options rw,noatime,noquota /dev/mapper/gentoo-linux_home /m
 mount --types vfat --options rw,noatime /dev/nvme0n1p1 /mnt/gentoo/boot/efi
 mount --types ext4 --options rw,noatime /dev/mapper/gentoo-var_log /mnt/gentoo/var/log
 
-sleep 5s
-
 cd /mnt/gentoo/root/
 # hey kids this is my ip address ugu.
 links 'http://192.168.1.103'
 
-msg_anim 'Stage 3 Install' 'Lets extract the tarballs.  I have enabled the v flag...' '5'
-msg_anim 'Stage 3 Install' '...for funsies.' '5'
-
-# daddy that hurts....
 tar xvpf /mnt/gentoo/root/$(ls | grep 'stage3') --xattrs-include='*.*' --numeric-owner -C /mnt/gentoo
 tar xvpf /mnt/gentoo/root/$(ls | grep 'portage') --xattrs-include='*.*'--numeric-owner -C /mnt/gentoo/usr
 
-sleep 5s
-
-# there once was a bug here.  he was squashed.  i use cleanex, it was kosher.
 mount --rbind /proc /mnt/gentoo/proc
 mount --make-rslave /mnt/gentoo/proc
 mount --rbind /sys /mnt/gentoo/sys
@@ -197,11 +179,8 @@ mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=1777 tmpfs /mnt/gento
 mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=1777,size=16G tmpfs /mnt/gentoo/var/tmp
 mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=755,size=16G,uid=portage,gid=portage,x-mount.mkdir=755 tmpfs /mnt/gentoo/var/tmp/portage
 
-sleep 5s
-
+echo 'Patching root password for chroot...'
 sed -i -e 's/^root:\*/root:/' /mnt/gentoo/etc/shadow
-
-# B U R G E R L A N D
 echo 'Injecting locale configuration for en_US...'
 cat <<'EOF' >> /mnt/gentoo/etc/locale.gen
 en_US ISO-8859-1
@@ -217,8 +196,7 @@ echo 'Injecting timezone configuration...'
 cat <<'EOF' > /mnt/gentoo/etc/timezone
 America/New_York
 EOF
-
-# H A P P Y L A N D 
+ 
 echo 'Injecting network configuration...'
 cat <<'EOF' > /mnt/gentoo/etc/hosts
 127.0.0.1   heavypaws-pc.localdomain heavypaws-pc localhost
@@ -248,7 +226,6 @@ cd /mnt/gentoo/etc/init.d
 ln -s net.lo net.enp10s0
 ln -s net.lo net.enp0s31f6
 cd ~
-
 
 # Portage sounds like an orafice you can-....  nevermind.
 echo 'Cleaning out portage directories...'
@@ -292,6 +269,10 @@ cat <<'EOF' > /mnt/gentoo/etc/portage/package.license/zs-kde
 =net-misc/dropbox-48.3.56 CC-BY-ND-3.0 dropbox
 EOF
 
+cat <<'EOF' > /mnt/gentoo/etc/portage/package.accept_keywords/zr-kde
+>=dev-libs/openssl-1.1.1c-r1 ~amd64
+EOF
+ 
 cat <<'EOF' > /mnt/gentoo/etc/portage/package.use/zw-kde
 >=dev-lang/python-2.7.15:2.7 sqlite
 >=x11-libs/libdrm-2.4.97 libkms
@@ -305,6 +286,11 @@ sys-fs/eudev abi_x86_32
 sys-fs/udisks introspection lvm vdo
 sys-libs/libblockdev vdo lvm
 sys-auth/polkit consolekit introspection
+>=dev-libs/libpcre2-10.32 pcre16
+>=app-text/xmlto-0.0.28-r1 text
+>=x11-libs/libxcb-1.13.1 xkb
+>=dev-qt/qtcore-5.12.3 icu
+>=dev-qt/qtnetwork-5.12.3 bindist
 EOF
 
 #-- fxies for nvidia --#
@@ -373,323 +359,61 @@ dev-qt/qtgui xcb
 app-text/gnome-doc-utils python_targets_python2_7
 app-accessibility/brltty python_targets_python2_7
 app-office/texmaker qt5 -qt4
-# required by dev-util/kdevelop-4.7.1-r1::gentoo
-# required by dev-util/kdevelop (argument)
 >=dev-qt/qtdeclarative-4.8.7:4 webkit
-# required by www-client/firefox-41.0-r1::gentoo
-# required by www-client/firefox (argument)
 >=dev-lang/python-2.7.10:2.7 sqlite
-# required by www-client/chromium-46.0.2490.42::gentoo
-# required by www-client/chromium (argument)
 >=dev-libs/libxml2-2.9.2-r1 icu
-# required by net-wireless/aircrack-ng-1.2_rc2::gentoo[airdrop-ng]
-# required by net-wireless/aircrack-ng (argument)
 >=net-wireless/lorcon-0.0_p20150109 python
-# required by app-office/texmaker-4.4.1-r1::gentoo[qt5]
-# required by app-office/texmaker (argument)
 >=dev-qt/qtwebkit-5.4.2 printsupport
-# required by sys-devel/clang-3.7.0-r100::gentoo
-# required by media-libs/mesa-11.0.0_rc2::gentoo[opencl]
-# required by kde-base/kwin-4.11.22::gentoo[opengl]
-# required by kde-apps/kdebase-meta-4.14.3::gentoo[-minimal]
-# required by kde-base/kde-meta-4.14.3::gentoo
-# required by kde-base/kde-meta (argument)
 >=sys-devel/llvm-3.7.0 clang
-# required by x11-drivers/xf86-video-vmware-13.1.0::gentoo
-# required by x11-base/xorg-drivers-1.17::gentoo[video_cards_vmware]
-# required by x11-base/xorg-server-1.17.2-r1::gentoo[xorg]
-# required by x11-drivers/xf86-video-mach64-6.9.5::gentoo
 >=x11-libs/libdrm-2.4.64 libkms
-# required by x11-drivers/xf86-video-vmware-13.1.0::gentoo
-# required by x11-base/xorg-drivers-1.17::gentoo[video_cards_vmware]
-# required by x11-base/xorg-server-1.17.2-r1::gentoo[xorg]
-# required by x11-drivers/xf86-video-mach64-6.9.5::gentoo
 >=media-libs/mesa-11.0.0_rc2 xa
-# required by media-libs/phonon-4.8.3-r1::gentoo[vlc]
-# required by kde-base/kdelibs-4.14.11::gentoo
-# required by kde-base/katepart-4.14.3::gentoo
 >=media-libs/phonon-vlc-0.8.2 qt5
-# required by dev-qt/qtgui-5.4.2-r1::gentoo[xcb]
-# required by dev-qt/qtx11extras-5.4.2::gentoo
-# required by kde-frameworks/kwindowsystem-5.13.0::gentoo[X]
-# required by kde-frameworks/knotifications-5.13.0::gentoo
-# required by kde-frameworks/kwallet-5.13.0-r1::gentoo
-# required by kde-frameworks/kio-5.13.0::gentoo
-# required by sys-block/partitionmanager-1.2.1::gentoo
-# required by sys-block/partitionmanager (argument)
 >=x11-libs/libxkbcommon-0.5.0 X
-# required by kde-frameworks/kglobalaccel-5.13.0::gentoo
-# required by kde-frameworks/kxmlgui-5.13.0::gentoo
-# required by kde-frameworks/kbookmarks-5.13.0::gentoo
-# required by kde-frameworks/kio-5.13.0::gentoo
-# required by sys-block/partitionmanager-1.2.1::gentoo
-# required by sys-block/partitionmanager (argument)
 >=kde-frameworks/kwindowsystem-5.13.0 X
-# required by kde-frameworks/knotifications-5.13.0::gentoo
-# required by kde-frameworks/kwallet-5.13.0-r1::gentoo
-# required by kde-frameworks/kio-5.13.0::gentoo
-# required by sys-block/partitionmanager-1.2.1::gentoo
-# required by sys-block/partitionmanager (argument)
 >=media-libs/phonon-4.8.3-r1 qt5 qt4
-# required by net-misc/networkmanager-1.0.4-r1::gentoo[wifi]
-# required by net-misc/networkmanager (argument)
 >=net-wireless/wpa_supplicant-2.4-r4 dbus
-# required by dev-qt/qtwebkit-5.4.2::gentoo
-# required by app-office/scribus-1.5.0-r1::gentoo
-# required by app-office/scribus (argument)
 >=dev-qt/qtcore-5.4.2 icu
-# required by media-video/vlc-2.2.1::gentoo
-# required by media-libs/phonon-vlc-0.8.2::gentoo
-# required by media-libs/phonon-4.8.3-r1::gentoo[vlc]
-# required by kde-base/kdelibs-4.14.11::gentoo
-# required by kde-apps/kdesu-15.08.0::gentoo
-# required by kde-base/khelpcenter-4.14.3::gentoo
 >=sys-libs/zlib-1.2.8-r1 minizip
-# required by gnome-base/gnome-keyring-3.16.0-r1::gentoo
-# required by gnome-base/libgnome-keyring-3.12.0::gentoo
-# required by gnome-base/libgnomeui-2.24.5-r1::gentoo
-# required by app-office/planner-0.14.6_p20130520::gentoo
-# required by app-office/planner (argument)
 >=app-crypt/pinentry-0.9.5 gnome-keyring
-# required by app-office/libreoffice-4.4.5.2::gentoo
-# required by app-office/libreoffice (argument)
 >=media-libs/harfbuzz-0.9.41 icu
 sys-libs/ncurses -gpm
-# required by dev-qt/qtcore-5.4.2::gentoo
-# required by dev-qt/qtdbus-5.4.2::gentoo
-# required by dev-qt/qtgui-5.4.2-r1::gentoo[dbus]
-# required by app-admin/testdisk-7.0-r2::gentoo[qt4,-static]
-# required by app-admin/testdisk (argument)
 >=dev-libs/libpcre-8.37-r2 pcre16
 sys-libs/ncurses -gpm
 net-fs/samba winbind
 app-office/libreoffice -eds -python_single_target_python2_7 python_single_target_python3_4
 app-office/scribus -pdf
-# required by sys-libs/ldb-1.1.21::gentoo
-# required by net-fs/samba-4.1.19::gentoo
-# required by net-fs/cifs-utils-6.4::gentoo[acl]
-# required by net-fs/cifs-utils (argument)
 >=sys-libs/tdb-1.3.7 python
-# required by sys-libs/ldb-1.1.21::gentoo
-# required by net-fs/samba-4.1.19::gentoo
-# required by net-fs/cifs-utils-6.4::gentoo[acl]
-# required by net-fs/cifs-utils (argument)
 >=sys-libs/tevent-0.9.25 python
-# required by net-fs/samba-4.1.19::gentoo
-# required by net-fs/cifs-utils-6.4::gentoo[acl]
-# required by net-fs/cifs-utils (argument)
 >=sys-libs/ntdb-1.0-r1 python
-# required by net-fs/samba-4.1.19::gentoo
-# required by net-fs/cifs-utils-6.4::gentoo[acl]
-# required by net-fs/cifs-utils (argument)
 >=app-crypt/heimdal-1.5.3-r2 -ssl
-# required by app-office/akonadi-server-1.13.0-r1::gentoo[qt4]
-# required by kde-base/kdepimlibs-4.14.10::gentoo
-# required by kde-base/plasma-workspace-4.11.22::gentoo[kdepim]
-# required by kde-apps/kdebase-meta-4.14.3::gentoo[-minimal]
-# required by kde-base/kde-meta-4.14.3::gentoo
-# required by kde-meta (argument)
 #>=dev-qt/qtsql-4.8.7:4 mysql
-# required by kde-apps/libkexiv2-4.14.3::gentoo
-# required by kde-apps/kdegraphics-meta-4.14.3::gentoo
-# required by kde-base/kde-meta-4.14.3::gentoo
-# required by kde-meta (argument)
 >=media-gfx/exiv2-0.24-r1 xmp
-# required by dev-ruby/rdoc-4.1.2-r1::gentoo[ruby_targets_ruby22]
-# required by dev-lang/ruby-2.2.3::gentoo[rdoc]
-# required by dev-qt/qtwebkit-5.4.2::gentoo
-# required by kde-frameworks/kdewebkit-5.13.0::gentoo
-# required by kde-plasma/plasma-workspace-5.4.0::gentoo[drkonqi]
-# required by kde-plasma/plasma-mediacenter-5.4.0::gentoo
-# required by kde-plasma/plasma-meta-5.4.0::gentoo
-# required by kde-plasma/plasma-meta (argument)
 >=dev-ruby/racc-1.4.12 ruby_targets_ruby22
-# required by dev-lang/ruby-2.2.3::gentoo
-# required by dev-qt/qtwebkit-5.4.2::gentoo
-# required by kde-frameworks/kdewebkit-5.13.0::gentoo
-# required by kde-plasma/plasma-workspace-5.4.0::gentoo[drkonqi]
-# required by kde-plasma/plasma-mediacenter-5.4.0::gentoo
-# required by kde-plasma/plasma-meta-5.4.0::gentoo
-# required by kde-plasma/plasma-meta (argument)
 >=dev-ruby/rake-10.4.2 ruby_targets_ruby22
-# required by dev-lang/ruby-2.2.3::gentoo
-# required by dev-qt/qtwebkit-5.4.2::gentoo
-# required by kde-frameworks/kdewebkit-5.13.0::gentoo
-# required by kde-plasma/plasma-workspace-5.4.0::gentoo[drkonqi]
-# required by kde-plasma/plasma-mediacenter-5.4.0::gentoo
-# required by kde-plasma/plasma-meta-5.4.0::gentoo
-# required by kde-plasma/plasma-meta (argument)
 >=dev-ruby/power_assert-0.2.4 ruby_targets_ruby22
-# required by dev-lang/ruby-2.2.3::gentoo
-# required by dev-qt/qtwebkit-5.4.2::gentoo
-# required by kde-frameworks/kdewebkit-5.13.0::gentoo
-# required by kde-plasma/plasma-workspace-5.4.0::gentoo[drkonqi]
-# required by kde-plasma/plasma-mediacenter-5.4.0::gentoo
-# required by kde-plasma/plasma-meta-5.4.0::gentoo
-# required by kde-plasma/plasma-meta (argument)
 >=dev-ruby/test-unit-3.1.3 ruby_targets_ruby22
-# required by dev-lang/ruby-2.2.3::gentoo
-# required by dev-qt/qtwebkit-5.4.2::gentoo
-# required by kde-frameworks/kdewebkit-5.13.0::gentoo
-# required by kde-plasma/plasma-workspace-5.4.0::gentoo[drkonqi]
-# required by kde-plasma/plasma-mediacenter-5.4.0::gentoo
-# required by kde-plasma/plasma-meta-5.4.0::gentoo
-# required by kde-plasma/plasma-meta (argument)
 >=dev-ruby/minitest-5.8.0 ruby_targets_ruby22
-# required by dev-ruby/rdoc-4.1.2-r1::gentoo[ruby_targets_ruby22]
-# required by dev-lang/ruby-2.2.3::gentoo[rdoc]
-# required by dev-qt/qtwebkit-5.4.2::gentoo
-# required by kde-frameworks/kdewebkit-5.13.0::gentoo
-# required by kde-plasma/plasma-workspace-5.4.0::gentoo[drkonqi]
-# required by kde-plasma/plasma-mediacenter-5.4.0::gentoo
-# required by kde-plasma/plasma-meta-5.4.0::gentoo
-# required by kde-plasma/plasma-meta (argument)
 >=dev-ruby/json-1.8.3 ruby_targets_ruby22
-# required by dev-lang/ruby-2.2.3::gentoo[rdoc]
-# required by dev-qt/qtwebkit-5.4.2::gentoo
-# required by kde-frameworks/kdewebkit-5.13.0::gentoo
-# required by kde-plasma/plasma-workspace-5.4.0::gentoo[drkonqi]
-# required by kde-plasma/plasma-mediacenter-5.4.0::gentoo
-# required by kde-plasma/plasma-meta-5.4.0::gentoo
-# required by kde-plasma/plasma-meta (argument)
 >=dev-ruby/rdoc-4.1.2-r1 ruby_targets_ruby22
-# required by sys-devel/clang-3.5.0-r100::gentoo
-# required by media-libs/mesa-10.3.7-r1::gentoo[opencl]
-# required by x11-base/xorg-server-1.16.4::gentoo[glamor]
-# required by x11-drivers/xf86-video-vmware-13.1.0::gentoo
-# required by x11-base/xorg-drivers-1.16::gentoo[video_cards_vmware]
 >=sys-devel/llvm-3.5.0 clang
-# required by dev-ruby/rake-10.4.2::gentoo[-test,ruby_targets_ruby22]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby21,-doc,-test]
-# required by dev-ruby/rdoc-4.1.2-r1::gentoo[ruby_targets_ruby20]
-# required by dev-lang/ruby-2.1.7::gentoo[rdoc]
-# required by dev-ruby/minitest-5.8.0::gentoo[ruby_targets_ruby21]
-# required by dev-lang/ruby-2.2.3::gentoo
-# required by dev-ruby/test-unit-3.1.3::gentoo[ruby_targets_ruby22]
 >=virtual/rubygems-11 ruby_targets_ruby22
-# required by virtual/rubygems-11::gentoo[ruby_targets_ruby22]
-# required by dev-ruby/minitest-5.8.0::gentoo[-test,ruby_targets_ruby22]
-# required by dev-lang/ruby-2.2.3::gentoo
-# required by dev-ruby/rake-10.4.2::gentoo[ruby_targets_ruby22]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby21,-doc,-test]
-# required by dev-ruby/rdoc-4.1.2-r1::gentoo[ruby_targets_ruby20]
-# required by dev-lang/ruby-2.1.7::gentoo[rdoc]
-# required by dev-ruby/test-unit-3.1.3::gentoo[ruby_targets_ruby21]
 >=dev-ruby/rubygems-2.4.8 ruby_targets_ruby22
-# required by www-client/chromium-47.0.2526.16::gentoo[system-ffmpeg]
-# required by chromium (argument)
 >=media-video/ffmpeg-2.8.1 opus vpx
-# required by kde-apps/libkface-15.08.2-r1::gentoo
-# required by media-gfx/digikam-4.14.0::gentoo
-# required by @selected
-# required by @world (argument)
 >=media-libs/opencv-3.0.0 contrib
-# required by dev-texlive/texlive-langczechslovak-2015-r1::gentoo
-# required by app-text/texlive-2015::gentoo[linguas_cs,linguas_sk]
-# required by app-text/dblatex-0.3.7::gentoo
-# required by app-text/asciidoc-8.6.9-r2::gentoo
-# required by sys-fs/btrfs-progs-4.2.2::gentoo
-# required by @selected
-# required by @world (argument)
 >=app-text/texlive-core-2015 cjk xetex
-# required by gnome-base/gvfs-1.26.2::gentoo
-# required by app-editors/gedit-3.18.2::gentoo
-# required by @selected
-# required by @world (argument)
 >=dev-libs/libgdata-0.17.3 gnome
 >=x11-libs/libdrm-2.4.65 video_cards_amdgpu
-# required by kde-plasma/kwin-5.5.0::gentoo
-# required by kde-plasma/plasma-workspace-5.5.0::gentoo
-# required by kde-plasma/kdeplasma-addons-5.5.0::gentoo
-# required by kde-plasma/plasma-meta-5.5.0::gentoo
-# required by @selected
-# required by @world (argument)
 >=media-libs/mesa-11.0.6 wayland
-# required by dev-lang/ruby-2.3.0::gentoo
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby21]
-# required by dev-lang/ruby-2.2.4::gentoo[rdoc]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby22]
-# required by dev-lang/ruby-2.0.0_p648::gentoo
-# required by dev-ruby/power_assert-0.2.6::gentoo[ruby_targets_ruby20]
-# required by dev-ruby/test-unit-3.1.5-r1::gentoo[ruby_targets_ruby21]
 >=dev-ruby/rake-10.4.2 ruby_targets_ruby23
-# required by dev-lang/ruby-2.3.0::gentoo
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby21]
-# required by dev-lang/ruby-2.2.4::gentoo[rdoc]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby22]
-# required by dev-lang/ruby-2.0.0_p648::gentoo
-# required by dev-ruby/rubygems-2.5.1::gentoo[ruby_targets_ruby20]
-# required by virtual/rubygems-11::gentoo[ruby_targets_ruby22]
-# required by dev-ruby/test-unit-3.1.5-r1::gentoo
 >=dev-ruby/power_assert-0.2.6 ruby_targets_ruby23
-# required by dev-lang/ruby-2.3.0::gentoo
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby21]
-# required by dev-lang/ruby-2.2.4::gentoo[rdoc]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby22]
-# required by dev-lang/ruby-2.0.0_p648::gentoo
-# required by dev-ruby/power_assert-0.2.6::gentoo[ruby_targets_ruby20]
-# required by dev-ruby/test-unit-3.1.5-r1::gentoo[ruby_targets_ruby21]
 >=virtual/rubygems-11 ruby_targets_ruby23
-# required by dev-lang/ruby-2.3.0::gentoo
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby21]
-# required by dev-lang/ruby-2.2.4::gentoo[rdoc]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby22]
-# required by dev-lang/ruby-2.0.0_p648::gentoo
-# required by dev-ruby/power_assert-0.2.6::gentoo[ruby_targets_ruby20]
-# required by dev-ruby/test-unit-3.1.5-r1::gentoo[ruby_targets_ruby21]
 >=dev-ruby/minitest-5.8.3 ruby_targets_ruby23
-# required by dev-lang/ruby-2.3.0::gentoo[rdoc]
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
 >=dev-ruby/rdoc-4.2.1 ruby_targets_ruby23
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby23]
-# required by dev-lang/ruby-2.3.0::gentoo[rdoc]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby23]
-# required by dev-lang/ruby-2.2.4::gentoo
-# required by dev-ruby/power_assert-0.2.6::gentoo[ruby_targets_ruby22]
-# required by dev-ruby/test-unit-3.1.5-r1::gentoo[ruby_targets_ruby21]
 >=dev-ruby/racc-1.4.14 ruby_targets_ruby23
-# required by dev-lang/ruby-2.3.0::gentoo
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby21]
-# required by dev-lang/ruby-2.2.4::gentoo[rdoc]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby22]
-# required by dev-lang/ruby-2.0.0_p648::gentoo
-# required by dev-ruby/power_assert-0.2.6::gentoo[ruby_targets_ruby20]
 >=dev-ruby/test-unit-3.1.5-r1 ruby_targets_ruby23
-# required by virtual/rubygems-11::gentoo[ruby_targets_ruby23]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby22,-test]
-# required by dev-lang/ruby-2.3.0::gentoo
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby21]
-# required by dev-lang/ruby-2.2.4::gentoo[rdoc]
-# required by dev-ruby/power_assert-0.2.6::gentoo[ruby_targets_ruby22]
-# required by dev-ruby/test-unit-3.1.5-r1::gentoo[ruby_targets_ruby21]
 >=dev-ruby/rubygems-2.5.1 ruby_targets_ruby23
-# required by dev-lang/ruby-2.3.0::gentoo
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby21]
-# required by dev-lang/ruby-2.2.4::gentoo[rdoc]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby22]
-# required by dev-lang/ruby-2.0.0_p648::gentoo
-# required by dev-ruby/power_assert-0.2.6::gentoo[ruby_targets_ruby20]
-# required by dev-ruby/test-unit-3.1.5-r1::gentoo[ruby_targets_ruby21]
 >=dev-ruby/did_you_mean-1.0.0 ruby_targets_ruby23
-# required by dev-lang/ruby-2.3.0::gentoo
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby21]
-# required by dev-lang/ruby-2.2.4::gentoo[rdoc]
-# required by dev-ruby/json-1.8.3::gentoo[ruby_targets_ruby22]
-# required by dev-lang/ruby-2.0.0_p648::gentoo
-# required by dev-ruby/power_assert-0.2.6::gentoo[ruby_targets_ruby20]
-# required by dev-ruby/test-unit-3.1.5-r1::gentoo[ruby_targets_ruby21]
 >=dev-ruby/net-telnet-0.1.1 ruby_targets_ruby23
-# required by dev-ruby/rdoc-4.2.1::gentoo[ruby_targets_ruby23]
-# required by dev-lang/ruby-2.3.0::gentoo[rdoc]
-# required by dev-ruby/racc-1.4.14::gentoo[ruby_targets_ruby23]
 >=dev-ruby/json-1.8.3 ruby_targets_ruby23
 dev-qt/qtmultimedia gstreamer
 lxqt-base/lxqt-meta sddm minimal
@@ -712,7 +436,7 @@ CPU_FLAGS_X86=""
 DISTDIR="/var/cache/distfiles"
 PKGDIR="/var/cache/binpkgs"
 PORTAGE_TMPDIR="/var/tmp/portage"
-EMERGE_DEFAULT_OPTS="--jobs 1 --with-bdeps=y --keep-going=y" 
+EMERGE_DEFAULT_OPTS="--jobs 1 --with-bdeps-auto=y --autounmask=y --autounmask-write=y --quiet=y --quiet-build=y --keep-going=y" 
 GENTOO_MIRRORS=""
 
 USE="X amd64 posix nptl smp avahi curl ipv6 acpi hddtemp libnotify lm_sensors pam readline syslog unicode usb openssl alsa pulseaudio kde pm-utils dbus policykit udisks lvm -gnome -static -systemd"
@@ -730,7 +454,6 @@ GRUB_PLATFORM="efi-64"
 
 EOF
 
-# barf citaaaay, barf citaaaay, BARF CITeeeeeeEEE!  *vomit compilation 9*
 echo "Autogenerating make.conf..."
 echo 'Setting MAKEOPTS...'
 perl -pi -e 's|(MAKEOPTS\=\")(.*)(")|${1}-j'$(perl -e'use POSIX; print ceil('$(nproc --all)'*0.5);')' -l'$(perl -e'use POSIX; print floor('$(nproc --all)'*0.9);')'${3}|g;' /mnt/gentoo/etc/portage/make.conf
@@ -742,8 +465,6 @@ cmd='s|(CPU\_FLAGS\_X86\=\")(.*)(")|${1}'$(cpuid2cpuflags | cut -d' ' -f 2-)'${3
 echo 'Setting GENTOO_MIRRORS...'
 cmd='s|(GENTOO\_MIRRORS\=\")(.*)(")|${1}'$(mirrorselect -b50 -s3 -R 'North America' -q -o 2>/dev/null | perl -p -e 's|(GENTOO\_MIRRORS\=\")(.*)(")|${2}|g' | awk '{printf $0}')'${3}|g'; perl -pi -e "$cmd" /mnt/gentoo/etc/portage/make.conf
 
-# bug #2 with the home partition was here.  a cleanex rests in his place.
-# f for the innocent bugs who died as a result of making this script.
 echo 'Copying fstab...'
 cat <<'EOF' > /etc/fstab
 /dev/nvme0n1p1                      /boot/efi        vfat              noatime                                                                             0 2
@@ -757,10 +478,10 @@ tmpfs                               /var/tmp/portage tmpfs             rw,nosuid
 efivarfs                            /sys/firmware/efi/efivars efivarfs rw,nosuid,nodev,noexec,relatime                                                     0 0
 EOF
 
-sleep 5s
-
 msg_anim 'Chroot' 'The next stage of the installer runs in the chroot.' '5'
 msg_anim 'Chroot' 'My script auto-injects this.' '5'
+msg_anim 'Chroot' 'The UI portion of the script will continue when that stage' '5'
+msg_anim 'Chroot' 'is reached' '5'
 
 #- PUT IT INSIDE ME -#
 cat <<'INNERSCRIPT' >/mnt/gentoo/root/chroot_inner_script.sh
@@ -772,18 +493,12 @@ export PS1="(chroot) $PS1"
 
 emerge-webrsync
 env-update
-
-sleep 5s
+emerge app-crypt/openpgp-keys-gentoo-release
 
 emerge --config sys-libs/timezone-data
 locale-gen
 
-sleep 5s
-
-# send nudes
 emerge =sys-kernel/linux-headers-5.1::gentoo =sys-kernel/ck-sources-5.1.7::gentoo
-
-sleep 5s
 
 cd /usr/src/linux
 make clean && make mrproper
@@ -6242,66 +5957,31 @@ make -j8
 make modules_install
 make install
 cd ~
-
-sleep 5s
-
 umount -v efivarfs && mount -v efivarfs 
 
-sleep 5s
-
-# poop
-emerge dracut lvm2 sys-kernel/linux-firmware sys-firmware/intel-microcode sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-fs/udisks sys-auth/polkit x11-drivers/nvidia-drivers
+emerge dracut lvm2 sys-kernel/linux-firmware sys-firmware/intel-microcode sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-fs/udisks sys-auth/polkit sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate acpi acpid x11-drivers/nvidia-drivers
 env-update
-
-sleep 5s
-
-# farts
 dracut --kver 5.1.7-ck -H --add "lvm dm" --add-drivers "efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci" --hostonly-cmdline --fstab --gzip --lvmconf --force /boot/initramfs-5.1.7-ck.img
-
-sleep 5s
-
 cat <<'EOFDOC' > /etc/default/grub
 GRUB_DISTRIBUTOR="Gentoo"
-
 GRUB_CMDLINE_LINUX="rd.auto=1"#
 EOFDOC
 grub-install /dev/nvme0n1 --efi-directory=/boot/efi --target=x86_64-efi --no-floppy
 grub-mkconfig -o /boot/grub/grub.cfg
 
-sleep 5s
- 
-# *mouth noises*
 emerge app-portage/eix app-portage/gentoolkit app-portage/genlop app-portage/portage-utils app-portage/layman 
 
-sleep 5s
- 
-# tune it to eb like your moms [ BOOP ] and shove it somewhere.
-emerge x11-base/xorg-drivers x11-base/xorg-server x11-apps/xinit app-arch/unrar
-
-sleep 5s
-
-# hes op plz nerf
+emerge x11-base/xorg-drivers x11-base/xorg-server x11-apps/xinit app-arch/unrar x11-misc/sddm net-misc/x11-ssh-askpass
 nvidia-xconfig
 eselect opengl set nvidia
 
-sleep 5s
-
-# setup system services
-emerge sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate 
-
-sleep 5s
-
-# Emerge KDE Plasma 5
-# saying the zeeky words causes a nuclear explosion.
 eselect profile set 23
 layman --fetch --add kde
-emerge -uDU --keep-going --with-bdeps=y @world
-
-sleep 5s
-
-emerge x11-misc/sddm acpi acpid @kde-plasma @kde-frameworks @kdeutils
-
+emerge --sync
+emerge @kde-plasma @kde-frameworks @kdeutils
 emerge --changed-use kde-plasma/systemsettings
+emerge @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
+emerge -uDU --keep-going --with-bdeps=y @world
 cat <<'EOFDOC' > /etc/pam.d/sddm
 #%PAM-1.0
 
@@ -6319,65 +5999,12 @@ session         include         system-login
 -session        optional        pam_gnome_keyring.so auto_start
 -session        optional        pam_kwallet5.so auto_start
 EOFDOC
-
-cat <<'EOFDOC' > /etc/syslog-ng/syslog-ng.conf
-@version: 3.22
-#
-# Syslog-ng default configuration file for Gentoo Linux
-
-# https://bugs.gentoo.org/426814
-@include "scl.conf"
-
-options {
-    threaded(yes);
-    chain_hostnames(no);
-
-    # The default action of syslog-ng is to log a STATS line
-    # to the file every 10 minutes.  That's pretty ugly after a while.
-    # Change it to every 12 hours so you get a nice daily update of
-    # how many messages syslog-ng missed (0).
-    stats_freq(43200);
-    # The default action of syslog-ng is to log a MARK line
-    # to the file every 20 minutes.  That's seems high for most
-    # people so turn it down to once an hour.  Set it to zero
-    # if you don't want the functionality at all.
-    mark_freq(3600);
-};
-
-source src { system(); internal(); };
-
-destination messages { file("/var/log/messages"); };
-
-# By default messages are logged to tty12...
-destination console_all { file("/dev/tty12"); };
-# ...if you intend to use /dev/console for programs like xconsole
-# you can comment out the destination line above that references /dev/tty12
-# and uncomment the line below.
-#destination console_all { file("/dev/console"); };
-
-log { source(src); destination(messages); };
-log { source(src); destination(console_all); };
-EOFDOC
-
-env-update
-
-sleep 5s
-
-# i have an app for that
-# I HAVE THEM ALL.
-emerge @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
-env-update
-
-sleep 5s
-
+usermod -a -G video sddm
 cat <<'EOFDOC' > /etc/conf.d/xdm
 DISPLAYMANAGER="sddm"
 EOFDOC
-usermod -a -G video sddm
 
-sleep 5s
-
-emerge app-admin/sudo net-misc/x11-ssh-askpass
+emerge app-admin/sudo
 
 cat <<'EOFDOC' > /etc/sudoers
 ## sudoers file.
@@ -6479,16 +6106,51 @@ root ALL=(ALL) ALL
 #includedir /etc/sudoers.d
 EOFDOC
 
-sleep 5s
-
-# i gained weight
 useradd heavypaws -g users -G wheel,video,audio,root,sys,disk,adm,sddm,bin,daemon,tty,portage,console,plugdev,usb,cdrw,cdrom,input,lp,uucp -d /home/heavypaws -s /bin/bash 
 mkdir /home/heavypaws 
 cp -a /etc/skel/. /home/heavypaws/.
 chown -R heavypaws /home/heavypaws
 
-# chair farts
+#- USER STUFF -#
 sed -i 's/threaded(yes)/threaded(no)/g' /etc/syslog-ng/syslog-ng.conf 
+cat <<'EOFDOC' > /etc/syslog-ng/syslog-ng.conf
+@version: 3.22
+#
+# Syslog-ng default configuration file for Gentoo Linux
+
+# https://bugs.gentoo.org/426814
+@include "scl.conf"
+
+options {
+    threaded(yes);
+    chain_hostnames(no);
+
+    # The default action of syslog-ng is to log a STATS line
+    # to the file every 10 minutes.  That's pretty ugly after a while.
+    # Change it to every 12 hours so you get a nice daily update of
+    # how many messages syslog-ng missed (0).
+    stats_freq(43200);
+    # The default action of syslog-ng is to log a MARK line
+    # to the file every 20 minutes.  That's seems high for most
+    # people so turn it down to once an hour.  Set it to zero
+    # if you don't want the functionality at all.
+    mark_freq(3600);
+};
+
+source src { system(); internal(); };
+
+destination messages { file("/var/log/messages"); };
+
+# By default messages are logged to tty12...
+destination console_all { file("/dev/tty12"); };
+# ...if you intend to use /dev/console for programs like xconsole
+# you can comment out the destination line above that references /dev/tty12
+# and uncomment the line below.
+#destination console_all { file("/dev/console"); };
+
+log { source(src); destination(messages); };
+log { source(src); destination(console_all); };
+EOFDOC
 rc-update add syslog-ng default 
 rc-update add cronie default
 rc-update add net.enp10s0 default
@@ -6501,7 +6163,6 @@ rc-update add xdm default
 
 INNERSCRIPT
 
-#- this is nsfw -#
 chmod +x /mnt/gentoo/root/chroot_inner_script.sh
 chroot /mnt/gentoo/ /bin/bash /root/chroot_inner_script.sh
 
@@ -6526,8 +6187,6 @@ umount -l /mnt/gentoo/boot/efi
 umount -l /mnt/gentoo/tmp
 umount -l /mnt/gentoo/home
 umount -l /mnt/gentoo
-
-sleep 5s
 
 # love
 msg_anim 'Final Words' 'The source code for this script is available in the description.' '5'
