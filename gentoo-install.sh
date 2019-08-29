@@ -584,6 +584,8 @@ cat <<'INNERSCRIPT' >$CHROOT_MOUNT/root/chroot_inner_script.sh
 #!/bin/bash
 
 ROOT_PASSWORD="$1"
+ETH0_DEVICE='$2'
+ETH1_DEVICE='$3'
 
 env-update
 source /etc/profile
@@ -6385,7 +6387,7 @@ INNERSCRIPT
 # Well we put it all in there.  Now we gotta go to town on it~
 #
 chmod +x $CHROOT_MOUNT/root/chroot_inner_script.sh
-chroot $CHROOT_MOUNT/ /bin/bash /root/chroot_inner_script.sh "$ROOT_PASSWORD"
+chroot $CHROOT_MOUNT/ /bin/bash /root/chroot_inner_script.sh "$ROOT_PASSWORD" "$ETH0_DEVICE" "$ETH1_DEVICE"
 
 # here document with variable expansion.  Notice the lack of quotation marks around INNERSCRIPT
 # This tape will self-destruct in 3 hours.  Roger roger
