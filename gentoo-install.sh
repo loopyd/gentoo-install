@@ -50,6 +50,7 @@ BOOT_DEVICE='/dev/nvme0n1p1'
 LVM_DEVICE='/dev/nvme0n1p2'
 OS_DEVICE='/dev/nvme0n1'
 
+#- Network config -#
 MIRROR_SERVER_ADDRESS='192.168.1.103'
 ETH0_DEVICE='enp10s0'
 ETH0_ADDRESS='192.168.1.104'
@@ -61,14 +62,16 @@ GATEWAY_ADDRESS='192.168.1.1'
 DNS1_ADDRESS='8.8.8.8'
 DNS2_ADDRESS='8.8.4.4'
 
+#- Locale and timezone config -#
 DEFAULT_LOCALE='en_US.UTF-8'
 LOCALES_TOGEN='en_US ISO-8859-1
 en_US.UTF-8 UTF-8'
 TIMEZONE='America/New_York'
 
-#- Config for bootstrapper.sh -#
+#- Account credential config -#
 USERNAME="heavypaws"
 PASSWORD="12345"
+ROOT_PASSWORD="123456"
 
 # have an ascii starfield  a really half ass one i wrote while drunk.  it looked good
 # while i was drinking, now i'm sober and it has problems.  have at.
@@ -232,8 +235,6 @@ mount --types vfat --options rw,noatime $BOOT_DEVICE $CHROOT_MOUNT/boot/efi
 mount --types ext4 --options rw,noatime $VARLOG_MOUNT $CHROOT_MOUNT/var/log
 
 cd $CHROOT_MOUNT/root/
-# hey kids this is my ip address uwu
-# set this to a private http server somewhere  it should have your tarballs on it, in any case.
 links "http://$MIRROR_SERVER_ADDRESS"
 
 tar xvpf $CHROOT_MOUNT/root/$(ls | grep 'stage3') --xattrs-include='*.*' --numeric-owner -C $CHROOT_MOUNT
@@ -581,6 +582,8 @@ msg_anim 'Chroot' 'is reached' '5'
 #
 cat <<'INNERSCRIPT' >$CHROOT_MOUNT/root/chroot_inner_script.sh
 #!/bin/bash
+
+ROOT_PASSWORD="$1"
 
 env-update
 source /etc/profile
@@ -6375,16 +6378,14 @@ rc-update add net.$ETH1_DEVICE default
 rc-update add sshd default
 
 #- ROOT PASSWORD -#
-echo 'Enter a new password for root:'
-passwd root
-
+echo -e "$ROOT_PASSWORD\n\$ROOT_PASSWORD" | passwd root
 INNERSCRIPT
 
 #- SEX -#
 # Well we put it all in there.  Now we gotta go to town on it~
 #
 chmod +x $CHROOT_MOUNT/root/chroot_inner_script.sh
-chroot $CHROOT_MOUNT/ /bin/bash /root/chroot_inner_script.sh
+chroot $CHROOT_MOUNT/ /bin/bash /root/chroot_inner_script.sh "$ROOT_PASSWORD"
 
 # here document with variable expansion.  Notice the lack of quotation marks around INNERSCRIPT
 # This tape will self-destruct in 3 hours.  Roger roger
