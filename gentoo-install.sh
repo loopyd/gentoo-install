@@ -584,8 +584,8 @@ cat <<'INNERSCRIPT' >$CHROOT_MOUNT/root/chroot_inner_script.sh
 #!/bin/bash
 
 ROOT_PASSWORD="$1"
-ETH0_DEVICE='$2'
-ETH1_DEVICE='$3'
+ETH0_DEVICE="$2"
+ETH1_DEVICE="$3"
 
 env-update
 source /etc/profile
@@ -6393,13 +6393,13 @@ chroot $CHROOT_MOUNT/ /bin/bash /root/chroot_inner_script.sh "$ROOT_PASSWORD" "$
 # This tape will self-destruct in 3 hours.  Roger roger
 cat <<INNERSCRIPT >$CHROOT_MOUNT/etc/profile.d/boot_kicker.sh
 #!/bin/bash
-. /home/$USERNAME/bootstrap.sh '$USERNAME' '$PASSWORD'
-rm -f /home/$USERNAME/bootstrap.sh
+. /root/bootstrap.sh '$USERNAME' '$PASSWORD'
+rm -f /root/bootstrap.sh
 rn -f /etc/profile.d/boot_kicker.sh
 reboot
 INNERSCRIPT
 
-cat <<'INNERSCRIPT' >$CHROOT_MOUNT/home/$USERNAME/bootstrap.sh
+cat <<'INNERSCRIPT' >$CHROOT_MOUNT/root/bootstrap.sh
 #!/bin/bash
 
 USERNAME="$1"
@@ -6539,6 +6539,7 @@ root ALL=(ALL) ALL
 #includedir /etc/sudoers.d
 EOFDOC
 
+#- USER ACCOUNT SETUP -#
 echo 'Setting up user account: '"$USERNAME"
 useradd $USERNAME -g users -G wheel,video,audio,root,sys,disk,adm,sddm,bin,daemon,tty,portage,console,plugdev,usb,cdrw,cdrom,input,lp,uucp -d /home/$USERNAME -s /bin/bash 
 mkdir /home/$USERNAME
@@ -6600,7 +6601,7 @@ INNERSCRIPT
 #                    Shitty YouTube channels by dads with bad puns, what did you expect?
 #
 chmod +x $CHROOT_MOUNT/etc/profile.d/boot_kicker.sh
-chmod +x $CHROOT_MOUNT/home/$USERNAME/bootstrapper.sh
+chmod +x $CHROOT_MOUNT/home/$USERNAME/bootstrap.sh
 
 #- SWEEP THE FLOOR -#
 # Cos I'm not getting my boots dirty.
