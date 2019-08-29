@@ -343,7 +343,6 @@ sys-auth/polkit consolekit introspection
 >=app-text/xmlto-0.0.28-r1 text
 >=x11-libs/libxcb-1.13.1 xkb
 >=dev-qt/qtcore-5.12.3 icu
->=dev-qt/qtnetwork-5.12.3 bindist
 EOF
 
 #-- fxies for nvidia --#
@@ -496,19 +495,22 @@ CPU_FLAGS_X86=""
 DISTDIR="/var/cache/distfiles"
 PKGDIR="/var/cache/binpkgs"
 PORTAGE_TMPDIR="/var/tmp/portage"
-EMERGE_DEFAULT_OPTS="--jobs 1 --with-bdeps-auto=y --autounmask=y --autounmask-write=y --quiet=y --quiet-build=y --keep-going=y" 
+EMERGE_DEFAULT_OPTS="--jobs 3 --with-bdeps-auto=y --deep --autounmask=y --autounmask-write=y --quiet=y --keep-going=y" 
 GENTOO_MIRRORS=""
 
-USE="X amd64 posix nptl smp avahi curl ipv6 acpi hddtemp libnotify lm_sensors pam readline syslog unicode usb openssl alsa pulseaudio kde pm-utils dbus policykit udisks lvm -gnome -static -systemd"
+USE="X amd64 posix nptl smp avahi curl ipv6 acpi hddtemp libnotify lm_sensors pam readline syslog unicode usb openssl alsa pulseaudio kde pm-utils dbus policykit udisks lvm ffmpeg -gnome -static -systemd -bindist"
 
 ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"
 LC_MESSAGES=C
 
 VIDEO_CARDS="nvidia intel"
 
-# My system has a classic PS/2 mouse port for old keyboards, you can remove this if want.
+# My system has a classic PS/2 mouse port for old keyboards, you can remove 'mouse' if want.
 INPUT_DEVICES="libinput joystick mouse"
-ALSA_CARDS=""
+
+# Creative SoundBlaster Z / ReCon 3D (Gets ZxR somewhat working w/ new patch loading built into kernel >= 4.8)
+# Thanks to the dude last year who ripped firmware from some HP Noteboke drivers.  HP sucks, you rock.
+ALSA_CARDS="ca0132"
 
 GRUB_PLATFORM="efi-64"
 
@@ -523,7 +525,6 @@ perl -pi -e 's|(MAKEOPTS\=\")(.*)(")|${1}-j'$(perl -e'use POSIX; print ceil('$(n
 echo 'Setting COMMON_FLAGS...'
 perl -pi -e 's|(COMMON\_FLAGS\=\")(.*)(")|${1}-march='$(gcc -march=native -Q --help=target | grep -- '-march=' | cut -f3)' -O2 -pipe${3}|g;' /mnt/gentoo/etc/portage/make.conf
 echo 'Setting CPU_FLAGS_X86...'
-perl -pi -e 's|(CPU\_FLAGS\_X86\=\")(.*)(")|${1}aes avx avx2 f16c fma3 mmx mmxext pclmul popcnt sse sse2 sse3 sse4_1 sse4_2 ssse3${3}|g;' /mnt/gentoo/etc/portage/make.conf
 cmd='s|(CPU\_FLAGS\_X86\=\")(.*)(")|${1}'$(cpuid2cpuflags | cut -d' ' -f 2-)'${3}|g;'; perl -pi -e "$cmd" /mnt/gentoo/etc/portage/make.conf
 echo 'Setting GENTOO_MIRRORS...'
 cmd='s|(GENTOO\_MIRRORS\=\")(.*)(")|${1}'$(mirrorselect -b50 -s3 -R 'North America' -q -o 2>/dev/null | perl -p -e 's|(GENTOO\_MIRRORS\=\")(.*)(")|${2}|g' | awk '{printf $0}')'${3}|g'; perl -pi -e "$cmd" /mnt/gentoo/etc/portage/make.conf
@@ -573,6 +574,19 @@ emerge app-crypt/openpgp-keys-gentoo-release
 emerge --config sys-libs/timezone-data
 locale-gen
 
+#- set up our system profile -#
+eselect profile set 23
+
+#- Bootstrap the system with the new make.conf and profile -#
+# This is the recompile the compiler gag we toss around at work.
+/usr/portage/scripts/bootstrap.sh && emerge -e system
+
+#- PORTAGE SHIT -#
+# Its the good kind.  Useful portage tools.  Also, use layman to add the kde group, we'll need it
+# later on...
+emerge app-portage/eix app-portage/gentoolkit app-portage/genlop app-portage/portage-utils app-portage/layman 
+layman --fetch --add kde
+
 #- THE KINKY BITS -#
 # The pajamas are comin' off!
 emerge =sys-kernel/linux-headers-5.1::gentoo =sys-kernel/ck-sources-5.1.7::gentoo
@@ -597,12 +611,13 @@ make clean && make mrproper
 # a whole lot.  :v
 #
 cat <<'EOFDOC' > /usr/src/linux/.config
+#
 # Automatically generated file; DO NOT EDIT.
 # Linux/x86 5.1.7-ck Kernel Configuration
 #
 
 #
-# Compiler: gcc (Gentoo Hardened 8.3.0-r1 p1.1) 8.3.0
+# Compiler: gcc (Gentoo 8.3.0-r1 p1.1) 8.3.0
 #
 CONFIG_CC_IS_GCC=y
 CONFIG_GCC_VERSION=80300
@@ -1957,7 +1972,8 @@ CONFIG_PREVENT_FIRMWARE_BUILD=y
 #
 CONFIG_FW_LOADER=y
 CONFIG_EXTRA_FIRMWARE=""
-# CONFIG_FW_LOADER_USER_HELPER is not set
+CONFIG_FW_LOADER_USER_HELPER=y
+# CONFIG_FW_LOADER_USER_HELPER_FALLBACK is not set
 CONFIG_ALLOW_DEV_COREDUMP=y
 # CONFIG_DEBUG_DRIVER is not set
 CONFIG_DEBUG_DEVRES=y
@@ -3999,6 +4015,7 @@ CONFIG_DRM_PANEL_BRIDGE=y
 #
 # CONFIG_DRM_ANALOGIX_ANX78XX is not set
 # CONFIG_DRM_V3D is not set
+# CONFIG_DRM_VC4 is not set
 # CONFIG_DRM_ETNAVIV is not set
 # CONFIG_DRM_HISI_HIBMC is not set
 # CONFIG_DRM_TINYDRM is not set
@@ -4107,6 +4124,8 @@ CONFIG_FRAMEBUFFER_CONSOLE_ROTATION=y
 # CONFIG_FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER is not set
 # CONFIG_LOGO is not set
 CONFIG_SOUND=y
+CONFIG_SOUND_OSS_CORE=y
+# CONFIG_SOUND_OSS_CORE_PRECLAIM is not set
 CONFIG_SND=y
 CONFIG_SND_TIMER=y
 CONFIG_SND_PCM=y
@@ -4114,7 +4133,10 @@ CONFIG_SND_HWDEP=y
 CONFIG_SND_SEQ_DEVICE=y
 CONFIG_SND_JACK=y
 CONFIG_SND_JACK_INPUT_DEV=y
-# CONFIG_SND_OSSEMUL is not set
+CONFIG_SND_OSSEMUL=y
+CONFIG_SND_MIXER_OSS=y
+CONFIG_SND_PCM_OSS=y
+CONFIG_SND_PCM_OSS_PLUGINS=y
 CONFIG_SND_PCM_TIMER=y
 CONFIG_SND_HRTIMER=y
 # CONFIG_SND_DYNAMIC_MINORS is not set
@@ -4126,8 +4148,10 @@ CONFIG_SND_VERBOSE_PROCFS=y
 CONFIG_SND_VMASTER=y
 CONFIG_SND_DMA_SGBUF=y
 CONFIG_SND_SEQUENCER=y
-CONFIG_SND_SEQ_DUMMY=y
-CONFIG_SND_SEQ_HRTIMER_DEFAULT=y
+CONFIG_SND_SEQ_DUMMY=m
+CONFIG_SND_SEQUENCER_OSS=y
+# CONFIG_SND_SEQ_HRTIMER_DEFAULT is not set
+CONFIG_SND_SEQ_MIDI_EVENT=y
 CONFIG_SND_DRIVERS=y
 # CONFIG_SND_PCSP is not set
 # CONFIG_SND_DUMMY is not set
@@ -4136,39 +4160,7 @@ CONFIG_SND_DRIVERS=y
 # CONFIG_SND_MTPAV is not set
 # CONFIG_SND_SERIAL_U16550 is not set
 # CONFIG_SND_MPU401 is not set
-CONFIG_SND_ISA=y
-# CONFIG_SND_ADLIB is not set
-# CONFIG_SND_AD1816A is not set
-# CONFIG_SND_AD1848 is not set
-# CONFIG_SND_ALS100 is not set
-# CONFIG_SND_AZT1605 is not set
-# CONFIG_SND_AZT2316 is not set
-# CONFIG_SND_AZT2320 is not set
-# CONFIG_SND_CMI8328 is not set
-# CONFIG_SND_CMI8330 is not set
-# CONFIG_SND_CS4231 is not set
-# CONFIG_SND_CS4236 is not set
-# CONFIG_SND_ES1688 is not set
-# CONFIG_SND_ES18XX is not set
-# CONFIG_SND_SC6000 is not set
-# CONFIG_SND_GUSCLASSIC is not set
-# CONFIG_SND_GUSEXTREME is not set
-# CONFIG_SND_GUSMAX is not set
-# CONFIG_SND_INTERWAVE is not set
-# CONFIG_SND_INTERWAVE_STB is not set
-# CONFIG_SND_JAZZ16 is not set
-# CONFIG_SND_OPL3SA2 is not set
-# CONFIG_SND_OPTI92X_AD1848 is not set
-# CONFIG_SND_OPTI92X_CS4231 is not set
-# CONFIG_SND_OPTI93X is not set
-# CONFIG_SND_MIRO is not set
-# CONFIG_SND_SB8 is not set
-# CONFIG_SND_SB16 is not set
-# CONFIG_SND_SBAWE is not set
-# CONFIG_SND_SSCAPE is not set
-# CONFIG_SND_WAVEFRONT is not set
-# CONFIG_SND_MSND_PINNACLE is not set
-# CONFIG_SND_MSND_CLASSIC is not set
+# CONFIG_SND_ISA is not set
 CONFIG_SND_PCI=y
 # CONFIG_SND_AD1889 is not set
 # CONFIG_SND_ALS300 is not set
@@ -4244,9 +4236,9 @@ CONFIG_SND_PCI=y
 CONFIG_SND_HDA=y
 CONFIG_SND_HDA_INTEL=y
 CONFIG_SND_HDA_HWDEP=y
-# CONFIG_SND_HDA_RECONFIG is not set
+CONFIG_SND_HDA_RECONFIG=y
 # CONFIG_SND_HDA_INPUT_BEEP is not set
-# CONFIG_SND_HDA_PATCH_LOADER is not set
+CONFIG_SND_HDA_PATCH_LOADER=y
 # CONFIG_SND_HDA_CODEC_REALTEK is not set
 # CONFIG_SND_HDA_CODEC_ANALOG is not set
 # CONFIG_SND_HDA_CODEC_SIGMATEL is not set
@@ -4259,12 +4251,13 @@ CONFIG_SND_HDA_CODEC_CA0132=y
 CONFIG_SND_HDA_CODEC_CA0132_DSP=y
 # CONFIG_SND_HDA_CODEC_CMEDIA is not set
 # CONFIG_SND_HDA_CODEC_SI3054 is not set
-# CONFIG_SND_HDA_GENERIC is not set
+CONFIG_SND_HDA_GENERIC=y
 CONFIG_SND_HDA_POWER_SAVE_DEFAULT=0
 CONFIG_SND_HDA_CORE=y
 CONFIG_SND_HDA_DSP_LOADER=y
 CONFIG_SND_HDA_COMPONENT=y
 CONFIG_SND_HDA_I915=y
+CONFIG_SND_HDA_EXT_CORE=y
 CONFIG_SND_HDA_PREALLOC_SIZE=64
 CONFIG_SND_USB=y
 # CONFIG_SND_USB_AUDIO is not set
@@ -4282,7 +4275,243 @@ CONFIG_SND_USB=y
 CONFIG_SND_PCMCIA=y
 # CONFIG_SND_VXPOCKET is not set
 # CONFIG_SND_PDAUDIOCF is not set
-# CONFIG_SND_SOC is not set
+CONFIG_SND_SOC=y
+CONFIG_SND_SOC_TOPOLOGY=y
+CONFIG_SND_SOC_ACPI=y
+# CONFIG_SND_SOC_ADI is not set
+# CONFIG_SND_SOC_AMD_ACP is not set
+# CONFIG_SND_SOC_AMD_ACP3x is not set
+# CONFIG_SND_ATMEL_SOC is not set
+# CONFIG_SND_BCM2835_SOC_I2S is not set
+# CONFIG_SND_SOC_CYGNUS is not set
+# CONFIG_SND_EP93XX_SOC is not set
+# CONFIG_SND_DESIGNWARE_I2S is not set
+
+#
+# SoC Audio for Freescale CPUs
+#
+
+#
+# Common SoC Audio options for Freescale CPUs:
+#
+# CONFIG_SND_SOC_FSL_ASRC is not set
+# CONFIG_SND_SOC_FSL_SAI is not set
+# CONFIG_SND_SOC_FSL_SSI is not set
+# CONFIG_SND_SOC_FSL_SPDIF is not set
+# CONFIG_SND_SOC_FSL_ESAI is not set
+# CONFIG_SND_SOC_FSL_MICFIL is not set
+# CONFIG_SND_SOC_IMX_AUDMUX is not set
+# CONFIG_SND_IMX_SOC is not set
+# CONFIG_SND_I2S_HI6210_I2S is not set
+# CONFIG_SND_JZ4740_SOC is not set
+# CONFIG_SND_KIRKWOOD_SOC is not set
+# CONFIG_SND_SOC_IMG is not set
+CONFIG_SND_SOC_INTEL_SST_TOPLEVEL=y
+CONFIG_SND_SOC_INTEL_SST=y
+# CONFIG_SND_SOC_INTEL_HASWELL is not set
+# CONFIG_SND_SOC_INTEL_BAYTRAIL is not set
+# CONFIG_SND_SST_ATOM_HIFI2_PLATFORM_PCI is not set
+# CONFIG_SND_SST_ATOM_HIFI2_PLATFORM_ACPI is not set
+# CONFIG_SND_SOC_INTEL_SKYLAKE is not set
+CONFIG_SND_SOC_INTEL_SKL=y
+# CONFIG_SND_SOC_INTEL_APL is not set
+CONFIG_SND_SOC_INTEL_KBL=y
+# CONFIG_SND_SOC_INTEL_GLK is not set
+# CONFIG_SND_SOC_INTEL_CNL is not set
+# CONFIG_SND_SOC_INTEL_CFL is not set
+CONFIG_SND_SOC_INTEL_SKYLAKE_FAMILY=y
+# CONFIG_SND_SOC_INTEL_SKYLAKE_HDAUDIO_CODEC is not set
+CONFIG_SND_SOC_INTEL_SKYLAKE_COMMON=y
+CONFIG_SND_SOC_ACPI_INTEL_MATCH=y
+CONFIG_SND_SOC_INTEL_MACH=y
+# CONFIG_SND_SOC_MTK_BTCVSD is not set
+
+#
+# ASoC support for Amlogic platforms
+#
+# CONFIG_SND_MESON_AXG_FRDDR is not set
+# CONFIG_SND_MESON_AXG_TODDR is not set
+# CONFIG_SND_MESON_AXG_TDMIN is not set
+# CONFIG_SND_MESON_AXG_TDMOUT is not set
+# CONFIG_SND_MESON_AXG_SOUND_CARD is not set
+# CONFIG_SND_MESON_AXG_SPDIFOUT is not set
+# CONFIG_SND_MESON_AXG_SPDIFIN is not set
+# CONFIG_SND_MESON_AXG_PDM is not set
+# CONFIG_SND_MXS_SOC is not set
+# CONFIG_SND_PXA2XX_SOC is not set
+# CONFIG_SND_SOC_QCOM is not set
+# CONFIG_SND_SOC_ROCKCHIP is not set
+# CONFIG_SND_SOC_SAMSUNG is not set
+
+#
+# SoC Audio support for Renesas SoCs
+#
+# CONFIG_SND_SOC_SH4_FSI is not set
+# CONFIG_SND_SOC_RCAR is not set
+# CONFIG_SND_SOC_SIRF is not set
+# CONFIG_SND_SOC_SPRD is not set
+# CONFIG_SND_SOC_STI is not set
+
+#
+# STMicroelectronics STM32 SOC audio support
+#
+# CONFIG_SND_SOC_STM32_SAI is not set
+# CONFIG_SND_SOC_STM32_I2S is not set
+# CONFIG_SND_SOC_STM32_SPDIFRX is not set
+
+#
+# Allwinner SoC Audio support
+#
+# CONFIG_SND_SUN4I_CODEC is not set
+# CONFIG_SND_SUN8I_CODEC_ANALOG is not set
+# CONFIG_SND_SUN50I_CODEC_ANALOG is not set
+# CONFIG_SND_SUN4I_I2S is not set
+
+#
+# Audio support for Texas Instruments SoCs
+#
+
+#
+# Texas Instruments DAI support for:
+#
+# CONFIG_SND_SOC_DAVINCI_ASP is not set
+# CONFIG_SND_SOC_DAVINCI_MCASP is not set
+# CONFIG_SND_SOC_DAVINCI_VCIF is not set
+# CONFIG_SND_SOC_OMAP_DMIC is not set
+# CONFIG_SND_SOC_OMAP_MCBSP is not set
+# CONFIG_SND_SOC_OMAP_MCPDM is not set
+
+#
+# Audio support for boards with Texas Instruments SoCs
+#
+# CONFIG_SND_SOC_OMAP_HDMI is not set
+# CONFIG_SND_SOC_UNIPHIER is not set
+# CONFIG_SND_SOC_XILINX_I2S is not set
+# CONFIG_SND_SOC_XILINX_AUDIO_FORMATTER is not set
+# CONFIG_SND_SOC_XILINX_SPDIF is not set
+# CONFIG_SND_SOC_XTFPGA_I2S is not set
+# CONFIG_ZX_SPDIF is not set
+# CONFIG_ZX_I2S is not set
+# CONFIG_ZX_TDM is not set
+CONFIG_SND_SOC_I2C_AND_SPI=y
+
+#
+# CODEC drivers
+#
+# CONFIG_SND_SOC_ALL_CODECS is not set
+# CONFIG_SND_SOC_AC97_CODEC is not set
+# CONFIG_SND_SOC_ADAU1701 is not set
+# CONFIG_SND_SOC_ADAU1761_I2C is not set
+# CONFIG_SND_SOC_ADAU7002 is not set
+# CONFIG_SND_SOC_AK4118 is not set
+# CONFIG_SND_SOC_AK4458 is not set
+# CONFIG_SND_SOC_AK4554 is not set
+# CONFIG_SND_SOC_AK4613 is not set
+# CONFIG_SND_SOC_AK4642 is not set
+# CONFIG_SND_SOC_AK5386 is not set
+# CONFIG_SND_SOC_AK5558 is not set
+# CONFIG_SND_SOC_ALC5623 is not set
+# CONFIG_SND_SOC_BD28623 is not set
+# CONFIG_SND_SOC_BT_SCO is not set
+# CONFIG_SND_SOC_CS35L32 is not set
+# CONFIG_SND_SOC_CS35L33 is not set
+# CONFIG_SND_SOC_CS35L34 is not set
+# CONFIG_SND_SOC_CS35L35 is not set
+# CONFIG_SND_SOC_CS35L36 is not set
+# CONFIG_SND_SOC_CS42L42 is not set
+# CONFIG_SND_SOC_CS42L51_I2C is not set
+# CONFIG_SND_SOC_CS42L52 is not set
+# CONFIG_SND_SOC_CS42L56 is not set
+# CONFIG_SND_SOC_CS42L73 is not set
+# CONFIG_SND_SOC_CS4265 is not set
+# CONFIG_SND_SOC_CS4270 is not set
+# CONFIG_SND_SOC_CS4271_I2C is not set
+# CONFIG_SND_SOC_CS42XX8_I2C is not set
+# CONFIG_SND_SOC_CS43130 is not set
+# CONFIG_SND_SOC_CS4341 is not set
+# CONFIG_SND_SOC_CS4349 is not set
+# CONFIG_SND_SOC_CS53L30 is not set
+# CONFIG_SND_SOC_JZ4740_CODEC is not set
+# CONFIG_SND_SOC_JZ4725B_CODEC is not set
+# CONFIG_SND_SOC_ES7134 is not set
+# CONFIG_SND_SOC_ES7241 is not set
+# CONFIG_SND_SOC_ES8316 is not set
+# CONFIG_SND_SOC_ES8328_I2C is not set
+# CONFIG_SND_SOC_GTM601 is not set
+# CONFIG_SND_SOC_INNO_RK3036 is not set
+# CONFIG_SND_SOC_MAX98088 is not set
+# CONFIG_SND_SOC_MAX98504 is not set
+# CONFIG_SND_SOC_MAX9867 is not set
+# CONFIG_SND_SOC_MAX98927 is not set
+# CONFIG_SND_SOC_MAX98373 is not set
+# CONFIG_SND_SOC_MAX9860 is not set
+# CONFIG_SND_SOC_MSM8916_WCD_ANALOG is not set
+# CONFIG_SND_SOC_MSM8916_WCD_DIGITAL is not set
+# CONFIG_SND_SOC_PCM1681 is not set
+# CONFIG_SND_SOC_PCM1789_I2C is not set
+# CONFIG_SND_SOC_PCM179X_I2C is not set
+# CONFIG_SND_SOC_PCM186X_I2C is not set
+# CONFIG_SND_SOC_PCM3060_I2C is not set
+# CONFIG_SND_SOC_PCM3168A_I2C is not set
+# CONFIG_SND_SOC_PCM512x_I2C is not set
+# CONFIG_SND_SOC_RK3328 is not set
+# CONFIG_SND_SOC_RT5616 is not set
+# CONFIG_SND_SOC_RT5631 is not set
+# CONFIG_SND_SOC_SGTL5000 is not set
+# CONFIG_SND_SOC_SIMPLE_AMPLIFIER is not set
+# CONFIG_SND_SOC_SIRF_AUDIO_CODEC is not set
+# CONFIG_SND_SOC_SPDIF is not set
+# CONFIG_SND_SOC_SSM2305 is not set
+# CONFIG_SND_SOC_SSM2602_I2C is not set
+# CONFIG_SND_SOC_SSM4567 is not set
+# CONFIG_SND_SOC_STA32X is not set
+# CONFIG_SND_SOC_STA350 is not set
+# CONFIG_SND_SOC_STI_SAS is not set
+# CONFIG_SND_SOC_TAS2552 is not set
+# CONFIG_SND_SOC_TAS5086 is not set
+# CONFIG_SND_SOC_TAS571X is not set
+# CONFIG_SND_SOC_TAS5720 is not set
+# CONFIG_SND_SOC_TAS6424 is not set
+# CONFIG_SND_SOC_TDA7419 is not set
+# CONFIG_SND_SOC_TFA9879 is not set
+# CONFIG_SND_SOC_TLV320AIC23_I2C is not set
+# CONFIG_SND_SOC_TLV320AIC31XX is not set
+# CONFIG_SND_SOC_TLV320AIC32X4_I2C is not set
+# CONFIG_SND_SOC_TLV320AIC3X is not set
+# CONFIG_SND_SOC_TS3A227E is not set
+# CONFIG_SND_SOC_TSCS42XX is not set
+# CONFIG_SND_SOC_TSCS454 is not set
+# CONFIG_SND_SOC_WCD9335 is not set
+# CONFIG_SND_SOC_WM8510 is not set
+# CONFIG_SND_SOC_WM8523 is not set
+# CONFIG_SND_SOC_WM8580 is not set
+# CONFIG_SND_SOC_WM8711 is not set
+# CONFIG_SND_SOC_WM8728 is not set
+# CONFIG_SND_SOC_WM8731 is not set
+# CONFIG_SND_SOC_WM8737 is not set
+# CONFIG_SND_SOC_WM8741 is not set
+# CONFIG_SND_SOC_WM8750 is not set
+# CONFIG_SND_SOC_WM8753 is not set
+# CONFIG_SND_SOC_WM8776 is not set
+# CONFIG_SND_SOC_WM8782 is not set
+# CONFIG_SND_SOC_WM8804_I2C is not set
+# CONFIG_SND_SOC_WM8903 is not set
+# CONFIG_SND_SOC_WM8904 is not set
+# CONFIG_SND_SOC_WM8960 is not set
+# CONFIG_SND_SOC_WM8962 is not set
+# CONFIG_SND_SOC_WM8974 is not set
+# CONFIG_SND_SOC_WM8978 is not set
+# CONFIG_SND_SOC_WM8985 is not set
+# CONFIG_SND_SOC_ZX_AUD96P22 is not set
+# CONFIG_SND_SOC_MAX9759 is not set
+# CONFIG_SND_SOC_MT6351 is not set
+# CONFIG_SND_SOC_MT6358 is not set
+# CONFIG_SND_SOC_NAU8540 is not set
+# CONFIG_SND_SOC_NAU8810 is not set
+# CONFIG_SND_SOC_NAU8822 is not set
+# CONFIG_SND_SOC_NAU8824 is not set
+# CONFIG_SND_SOC_TPA6130A2 is not set
+# CONFIG_SND_SIMPLE_CARD is not set
 CONFIG_SND_X86=y
 # CONFIG_HDMI_LPE_AUDIO is not set
 
@@ -6057,9 +6286,9 @@ cd ~
 umount -v efivarfs && mount -v efivarfs 
 
 #- INITRAMFS -#
-emerge dracut lvm2 sys-kernel/linux-firmware sys-firmware/intel-microcode sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-fs/udisks sys-auth/polkit sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate acpi acpid x11-drivers/nvidia-drivers
+emerge dracut lvm2 sys-firmware/intel-microcode sys-firmware/alsa-firmware sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-fs/udisks sys-auth/polkit sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate acpi acpid x11-drivers/nvidia-drivers
 env-update
-dracut --kver 5.1.7-ck -H --add "lvm dm" --add-drivers "efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci" --hostonly-cmdline --fstab --gzip --lvmconf --force /boot/initramfs-5.1.7-ck.img
+dracut --kver 5.1.7-ck -H --add "lvm dm" --add-drivers "efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci" -i /lib/firmware /lib/firmware --hostonly-cmdline --fstab --gzip --lvmconf --early-microcode --force /boot/initramfs-5.1.7-ck.img
 
 #- GRUB -#
 # Scrub-a-dub-grub
@@ -6069,10 +6298,6 @@ GRUB_CMDLINE_LINUX="rd.auto=1"
 EOFDOC
 grub-install /dev/nvme0n1 --efi-directory=/boot/efi --target=x86_64-efi --no-floppy
 grub-mkconfig -o /boot/grub/grub.cfg
-
-#- PORTAGE SHIT -#
-# Its the good kind.  Useful portage tools.
-emerge app-portage/eix app-portage/gentoolkit app-portage/genlop app-portage/portage-utils app-portage/layman 
 
 #- IS IT XORG -#
 # Or is it ZORBG! What ever it is, we need it for the graphics, and a display manager to look pretty and junk
@@ -6085,12 +6310,9 @@ eselect opengl set nvidia
 # Its the reason the script takes 9 hours.  Emerge KDE, don't shit yourself, okay?
 # Get up and move around if ya need to.  Beat off to my videos.  Or somethin...
 #
-eselect profile set 23
-layman --fetch --add kde
-emerge @kde-plasma @kde-frameworks @kdeutils
+emerge kde-plasma/plasma-meta kde-plasma/kdeplasma-addons @kde-plasma @kde-frameworks @kdeutils
 emerge --changed-use kde-plasma/systemsettings
 emerge @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
-emerge -uDU --keep-going --with-bdeps=y @world
 cat <<'EOFDOC' > /etc/pam.d/sddm
 #%PAM-1.0
 
@@ -6113,10 +6335,13 @@ cat <<'EOFDOC' > /etc/conf.d/xdm
 DISPLAYMANAGER="sddm"
 EOFDOC
 
+#- sound -#
+emerge alsa-utils
+
 #- SUDO OFF, SUDO ON -#
 # Its like a flavor of martial arts or somethin
 #
-emerge app-admin/sudo
+emerge app-admin/sudo 
 
 cat <<'EOFDOC' > /etc/sudoers
 ## sudoers file.
@@ -6222,6 +6447,8 @@ useradd heavypaws -g users -G wheel,video,audio,root,sys,disk,adm,sddm,bin,daemo
 mkdir /home/heavypaws 
 cp -a /etc/skel/. /home/heavypaws/.
 chown -R heavypaws /home/heavypaws
+echo 'Please enter new password for user account:'
+passwd heavypaws
 
 #- USER STUFF -#
 sed -i 's/threaded(yes)/threaded(no)/g' /etc/syslog-ng/syslog-ng.conf 
@@ -6278,6 +6505,10 @@ rc-update add consolekit default
 rc-update add udisks default
 rc-update add acpid default
 rc-update add xdm default
+
+#- WORLD SYNC -#
+#- Finally, lock in our changes to the system by syncing them with world group!
+emerge --deep --newuse @world
 
 INNERSCRIPT
 
@@ -6338,4 +6569,4 @@ msg_anim 'Thank You' '... Thanks for Watching! ...' '5'
 #
 # [ crickets ]
 #
-# Aaand everyone got turned into big macs !  The end!
+# Aaand everyone got turned into big macs !  The end !
