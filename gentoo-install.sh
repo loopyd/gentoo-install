@@ -6601,7 +6601,7 @@ INNERSCRIPT
 #                    Shitty YouTube channels by dads with bad puns, what did you expect?
 #
 chmod +x $CHROOT_MOUNT/etc/profile.d/boot_kicker.sh
-chmod +x $CHROOT_MOUNT/home/$USERNAME/bootstrap.sh
+chmod +x $CHROOT_MOUNT/root/bootstrap.sh
 
 #- SWEEP THE FLOOR -#
 # Cos I'm not getting my boots dirty.
