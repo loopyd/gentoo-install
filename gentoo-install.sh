@@ -13,15 +13,7 @@
 # find+replace strings and things you should give a shit about, instead of my
 # pisspickle jars.
 #
-# /dev/nvme0n1p1                   boot/efi partition
 # /boot/efi                        who in the fuck uses BIOS nowadays?
-# /dev/nvme0n1p2                   LVM partition
-# /dev/nvme0n1                     base device path of install (replace it /dev/sda...)
-# /mnt/gentoo                      replace this string to configure your chroot point
-# /dev/mapper/gentoo-linux_home	   replace these to config lvm partitions
-# /dev/mapper/gentoo-linux_root
-# /dev/mapper/gentoo-swap
-# /dev/mapper/gentoo-var_log
 # xfs							the root's filesystems
 # ext4							the home partition and the var/log filesystems
 # vfat                         if you search for this, you'll get bootloader/efi stuff
@@ -48,6 +40,36 @@
 #      Papa Paws
 #
  
+#- Mount point config -#
+CHROOT_MOUNT='/mnt/gentoo'
+HOME_MOUNT='/dev/mapper/gentoo-linux_home'
+ROOT_MOUNT='/dev/mapper/gentoo-linux_root'
+SWAP_MOUNT='/dev/mapper/gentoo-swap'
+VARLOG_MOUNT'/dev/mapper/gentoo-var_log'
+BOOT_DEVICE='/dev/nvme0n1p1'
+LVM_DEVICE='/dev/nvme0n1p2'
+OS_DEVICE='/dev/nvme0n1'
+
+MIRROR_SERVER_ADDRESS='192.168.1.103'
+ETH0_DEVICE='enp10s0'
+ETH0_ADDRESS='192.168.1.104'
+ETH0_NETMASK='255.255.254.0'
+ETH1_DEVICE='enp0s31f6'
+ETH1_ADDRESS='192.168.1.105'
+ETH1_NETMASK='255.255.254.0'
+GATEWAY_ADDRESS='192.168.1.1'
+DNS1_ADDRESS='8.8.8.8'
+DNS2_ADDRESS='8.8.4.4'
+
+DEFAULT_LOCALE='en_US.UTF-8'
+LOCALES_TOGEN='en_US ISO-8859-1
+en_US.UTF-8 UTF-8'
+TIMEZONE='America/New_York'
+
+#- Config for bootstrapper.sh -#
+USERNAME="heavypaws"
+PASSWORD="12345"
+
 # have an ascii starfield  a really half ass one i wrote while drunk.  it looked good
 # while i was drinking, now i'm sober and it has problems.  have at.
 display_center(){
@@ -161,172 +183,173 @@ msg_anim 'This script is very long' 'Sit back, relax, and enjoy!' '10'
 
 #- Unmount for safety -#
 clear
-swapoff /dev/mapper/gentoo-swap
-umount -l /mnt/gentoo/sys 
-umount -l /mnt/gentoo/proc 
-umount /mnt/gentoo/dev/pts
-umount /mnt/gentoo/dev/shm 
-umount -l /mnt/gentoo/dev 
-umount -l /mnt/gentoo/var/tmp/portage
-umount -l /mnt/gentoo/var/tmp
-umount -l /mnt/gentoo/var/log 
-umount -l /mnt/gentoo/boot/efi
-umount -l /mnt/gentoo/tmp
-umount -l /mnt/gentoo/home
-umount -l /mnt/gentoo
+swapoff $SWAP_MOUNT
+umount -l $CHROOT_MOUNT/sys 
+umount -l $CHROOT_MOUNT/proc 
+umount $CHROOT_MOUNT/dev/pts
+umount $CHROOT_MOUNT/dev/shm 
+umount -l $CHROOT_MOUNT/dev 
+umount -l $CHROOT_MOUNT/var/tmp/portage
+umount -l $CHROOT_MOUNT/var/tmp
+umount -l $CHROOT_MOUNT/var/log 
+umount -l $CHROOT_MOUNT/boot/efi
+umount -l $CHROOT_MOUNT/tmp
+umount -l $CHROOT_MOUNT/home
+umount -l $CHROOT_MOUNT
 
 lvremove -f gentoo
-vgremove -f gentoo /dev/nvme0n1p2
-pvremove -f /dev/nvme0n1p2
-rm -rd /mnt/gentoo
-wipefs -af /dev/nvme0n1
+vgremove -f gentoo $LVM_DEVICE
+pvremove -f $LVM_DEVICE
+rm -rd $CHROOT_MOUNT
+wipefs -af $OS_DEVICE
 
 #- *formatting noises* -#
-sgdisk -ozg /dev/nvme0n1
-sgdisk -n 1:2048:+500M -c 1:"EFI System Partition" -t 1:ef00 /dev/nvme0n1
-sgdisk -n 2 -c 2:"Linux LVM" -t 2:8e00 /dev/nvme0n1
+sgdisk -ozg $OS_DEVICE
+sgdisk -n 1:2048:+500M -c 1:"EFI System Partition" -t 1:ef00 $OS_DEVICE
+sgdisk -n 2 -c 2:"Linux LVM" -t 2:8e00 $OS_DEVICE
 partprobe
 
-pvcreate /dev/nvme0n1p2
-vgcreate -f gentoo /dev/nvme0n1p2
+pvcreate $LVM_DEVICE
+vgcreate -f gentoo $LVM_DEVICE
 lvcreate -y -L 4G -n swap gentoo
 lvcreate -y -L 4G -n var_log gentoo
 lvcreate -y -l50%FREE -n linux_root gentoo
 lvcreate -y -l100%FREE -n linux_home gentoo
 
-mkfs.vfat -F32 /dev/nvme0n1p1
-mkfs.xfs -f /dev/mapper/gentoo-linux_root
-mkfs.ext4 -F /dev/mapper/gentoo-linux_home
-mkfs.ext4 -F /dev/mapper/gentoo-var_log
-mkswap -f /dev/mapper/gentoo-swap
-swapon /dev/mapper/gentoo-swap
+mkfs.vfat -F32 $BOOT_DEVICE
+mkfs.xfs -f $ROOT_MOUNT
+mkfs.ext4 -F $HOME_MOUNT
+mkfs.ext4 -F $VARLOG_MOUNT
+mkswap -f $SWAP_MOUNT
+swapon $SWAP_MOUNT
 
 #- MOUNT ME DAD! -#
-mkdir /mnt/gentoo
-mount --types xfs --options rw,noatime,attr2,inode64,noquota /dev/mapper/gentoo-linux_root /mnt/gentoo
-mkdir --parents /mnt/gentoo/proc /mnt/gentoo/sys /mnt/gentoo/dev /mnt/gentoo/dev/shm /mnt/gentoo/dev/pts /mnt/gentoo/var/tmp/portage /mnt/gentoo/var/log /mnt/gentoo/boot/efi /mnt/gentoo/tmp /mnt/gentoo/root /mnt/gentoo/home /mnt/gentoo/run
-mount --types ext4 --options rw,noatime,noquota /dev/mapper/gentoo-linux_home /mnt/gentoo/home
-mount --types vfat --options rw,noatime /dev/nvme0n1p1 /mnt/gentoo/boot/efi
-mount --types ext4 --options rw,noatime /dev/mapper/gentoo-var_log /mnt/gentoo/var/log
+mkdir $CHROOT_MOUNT
+mount --types xfs --options rw,noatime,attr2,inode64,noquota $ROOT_MOUNT $CHROOT_MOUNT
+mkdir --parents $CHROOT_MOUNT/proc $CHROOT_MOUNT/sys $CHROOT_MOUNT/dev $CHROOT_MOUNT/dev/shm $CHROOT_MOUNT/dev/pts $CHROOT_MOUNT/var/tmp/portage $CHROOT_MOUNT/var/log $CHROOT_MOUNT/boot/efi $CHROOT_MOUNT/tmp $CHROOT_MOUNT/root $CHROOT_MOUNT/home $CHROOT_MOUNT/run
+mount --types ext4 --options rw,noatime,noquota $HOME_MOUNT $CHROOT_MOUNT/home
+mount --types vfat --options rw,noatime $BOOT_DEVICE $CHROOT_MOUNT/boot/efi
+mount --types ext4 --options rw,noatime $VARLOG_MOUNT $CHROOT_MOUNT/var/log
 
-cd /mnt/gentoo/root/
+cd $CHROOT_MOUNT/root/
 # hey kids this is my ip address uwu
 # set this to a private http server somewhere  it should have your tarballs on it, in any case.
-links 'http://192.168.1.103'
+links "http://$MIRROR_SERVER_ADDRESS"
 
-tar xvpf /mnt/gentoo/root/$(ls | grep 'stage3') --xattrs-include='*.*' --numeric-owner -C /mnt/gentoo
-tar xvpf /mnt/gentoo/root/$(ls | grep 'portage') --xattrs-include='*.*'--numeric-owner -C /mnt/gentoo/usr
+tar xvpf $CHROOT_MOUNT/root/$(ls | grep 'stage3') --xattrs-include='*.*' --numeric-owner -C $CHROOT_MOUNT
+tar xvpf $CHROOT_MOUNT/root/$(ls | grep 'portage') --xattrs-include='*.*'--numeric-owner -C $CHROOT_MOUNT/usr
 
 #- Kinky~ -#
-mount --rbind /proc /mnt/gentoo/proc
-mount --make-rslave /mnt/gentoo/proc
-mount --rbind /sys /mnt/gentoo/sys
-mount --make-rslave /mnt/gentoo/sys
-mount --rbind /dev /mnt/gentoo/dev
-mount --make-rslave /mnt/gentoo/dev
+mount --rbind /proc $CHROOT_MOUNT/proc
+mount --make-rslave $CHROOT_MOUNT/proc
+mount --rbind /sys $CHROOT_MOUNT/sys
+mount --make-rslave $CHROOT_MOUNT/sys
+mount --rbind /dev $CHROOT_MOUNT/dev
+mount --make-rslave $CHROOT_MOUNT/dev
 test -L /dev/shm && rmdir /dev/shm && mkdir /dev/shm 
-mount -t devpts -o rw,remount,nosuid,noexec,relatime,gid=5,mode=620 -force none /mnt/gentoo/dev/pts
-mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=1777 tmpfs /mnt/gentoo/tmp
-mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=1777,size=16G tmpfs /mnt/gentoo/var/tmp
-mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=755,size=16G,uid=portage,gid=portage,x-mount.mkdir=755 tmpfs /mnt/gentoo/var/tmp/portage
+mount -t devpts -o rw,remount,nosuid,noexec,relatime,gid=5,mode=620 -force none $CHROOT_MOUNT/dev/pts
+mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=1777 tmpfs $CHROOT_MOUNT/tmp
+mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=1777,size=16G tmpfs $CHROOT_MOUNT/var/tmp
+mount --types tmpfs --options rw,nosuid,noatime,nodev,mode=755,size=16G,uid=portage,gid=portage,x-mount.mkdir=755 tmpfs $CHROOT_MOUNT/var/tmp/portage
 
 echo 'Patching root password for chroot...'
-sed -i -e 's/^root:\*/root:/' /mnt/gentoo/etc/shadow
+sed -i -e 's/^root:\*/root:/' $CHROOT_MOUNT/etc/shadow
 
 #- CONFIGULATOR! -#
 # I'll config you later~
 echo 'Injecting locale configuration for en_US...'
-cat <<'EOF' >> /mnt/gentoo/etc/locale.gen
-en_US ISO-8859-1
-en_US.UTF-8 UTF-8
+cat <<EOF >> $CHROOT_MOUNT/etc/locale.gen
+$LOCALES_TOGEN
 EOF
 
-cat <<'EOF' >> /mnt/gentoo/etc/env.d/02locale 
-LANG="en_US.UTF-8"
+cat <<EOF >> $CHROOT_MOUNT/etc/env.d/02locale 
+LANG="$DEFAULT_LOCALE"
 LC_COLLATE="C"
 EOF
 
 echo 'Injecting timezone configuration...'
-cat <<'EOF' > /mnt/gentoo/etc/timezone
-America/New_York
+cat <<EOF > $CHROOT_MOUNT/etc/timezone
+$TIMEZONE
 EOF
  
 echo 'Injecting network configuration...'
-cat <<'EOF' > /mnt/gentoo/etc/hosts
-127.0.0.1   heavypaws-pc.localdomain heavypaws-pc localhost
-::1         heavypaws-pc.localdomain heavypaws-pc localhost
+cat <<EOF > $CHROOT_MOUNT/etc/hosts
+127.0.0.1 $USERNAME-pc.localdomain $USERNAME-pc localhost
+::1 $USERNAME-pc.localdomain $USERNAME-pc localhost
 EOF
 
-cat <<'EOF' > /mnt/gentoo/etc/hostname
-heavypaws-pc
+cat <<EOF > $CHROOT_MOUNT/etc/hostname
+$USERNAME-pc
 EOF
 
-cat <<'EOF' > /mnt/gentoo/etc/resolv.conf
-nameserver 192.168.1.1
-nameserver 8.8.8.8
+cat <<EOF > $CHROOT_MOUNT/etc/resolv.conf
+nameserver $DNS1_ADDRESS
+nameserver $DNS2_ADDRESS
 EOF
 
-mkdir /mnt/gentoo/etc/conf.d
-cat <<'EOF' > /mnt/gentoo/etc/conf.d/net
-config_enp10s0="192.168.1.104 netmask 255.255.255.0"
-routes_enp10s0="default via 192.168.1.1"
-dns_servers_enp10s0="192.168.1.1 8.8.8.8"
-config_enp0s31f6="192.168.1.105 netmask 255.255.255.0"
-routes_enp0s31f6="default via 192.168.1.1"
-dns_servers_enp0s31f6="192.168.1.1 8.8.8.8"
+mkdir $CHROOT_MOUNT/etc/conf.d
+
+# in-place here document with variable expansion
+cat <<EOF > $CHROOT_MOUNT/etc/conf.d/net
+config_$ETH0_DEVICE="$ETH0_ADDRESS netmask $ETH0_NETMASK"
+routes_$ETH0_DEVICE="default via $GATEWAY_ADDRESS"
+dns_servers_$ETH0_DEVICE="$DNS1_ADDRESS $DNS2_ADDRESS"
+config_$ETH1_DEVICE="$ETH1_ADDRESS netmask $ETH1_NETMASK"
+routes_$ETH1_DEVICE="default via $GATEWAY_ADDRESS"
+dns_servers_$ETH1_DEVICE="$DNS1_ADDRESS $DNS2_ADDRESS"
 EOF
 
-cd /mnt/gentoo/etc/init.d
-ln -s net.lo net.enp10s0
-ln -s net.lo net.enp0s31f6
+cd $CHROOT_MOUNT/etc/init.d
+ln -s net.lo net.$ETH0_DEVICE
+ln -s net.lo net.$ETH1_DEVICE
 cd ~
 
 #- PORTAGE JUNK IN THE BIG PAW'S TRUNK -#
 # Portage sounds like an orafice you can-....  nevermind.
 echo 'Cleaning out portage directories...'
-rm -f /mnt/gentoo/etc/portage/package.mask >/dev/null 2>&1
-rm -fdr /mnt/gentoo/etc/portage/package.mask >/dev/null 2>&1
-rm -f /mnt/gentoo/etc/portage/package.use >/dev/null 2>&1
-rm -fdr /mnt/gentoo/etc/portage/package.use >/dev/null 2>&1
-rm -f /mnt/gentoo/etc/portage/package.license >/dev/null 2>&1
-rm -fdr /mnt/gentoo/etc/portage/package.license >/dev/null 2>&1
-rm -f /mnt/gentoo/etc/portage/package.accept_keywords >/dev/null 2>&1
-rm -fdr /mnt/gentoo/etc/portage/package.accept_keywords >/dev/null 2>&1
-mkdir /mnt/gentoo/etc/portage/package.mask >/dev/null 2>&1
-mkdir /mnt/gentoo/etc/portage/package.use >/dev/null 2>&1
-mkdir /mnt/gentoo/etc/portage/package.license >/dev/null 2>&1
-mkdir /mnt/gentoo/etc/portage/package.accept_keywords >/dev/null 2>&1
-mkdir /mnt/gentoo/etc/portage/repos.conf >/dev/null 2>&1
-mkdir --parents /mnt/gentoo/var/db/repos/gentoo >/dev/null 2>&1
+rm -f $CHROOT_MOUNT/etc/portage/package.mask >/dev/null 2>&1
+rm -fdr $CHROOT_MOUNT/etc/portage/package.mask >/dev/null 2>&1
+rm -f $CHROOT_MOUNT/etc/portage/package.use >/dev/null 2>&1
+rm -fdr $CHROOT_MOUNT/etc/portage/package.use >/dev/null 2>&1
+rm -f $CHROOT_MOUNT/etc/portage/package.license >/dev/null 2>&1
+rm -fdr $CHROOT_MOUNT/etc/portage/package.license >/dev/null 2>&1
+rm -f $CHROOT_MOUNT/etc/portage/package.accept_keywords >/dev/null 2>&1
+rm -fdr $CHROOT_MOUNT/etc/portage/package.accept_keywords >/dev/null 2>&1
+mkdir $CHROOT_MOUNT/etc/portage/package.mask >/dev/null 2>&1
+mkdir $CHROOT_MOUNT/etc/portage/package.use >/dev/null 2>&1
+mkdir $CHROOT_MOUNT/etc/portage/package.license >/dev/null 2>&1
+mkdir $CHROOT_MOUNT/etc/portage/package.accept_keywords >/dev/null 2>&1
+mkdir $CHROOT_MOUNT/etc/portage/repos.conf >/dev/null 2>&1
+mkdir --parents $CHROOT_MOUNT/var/db/repos/gentoo >/dev/null 2>&1
 
 echo 'Copying portage repo configuration...'
-cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+cp $CHROOT_MOUNT/usr/share/portage/config/repos.conf $CHROOT_MOUNT/etc/portage/repos.conf/gentoo.conf
 
 #-- fixes for portage --#
 echo 'Copying portage package configuration...'
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.use/zu-layman
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/zu-layman
 app-portage/layman sync-plugin-portage
 EOF
 
 #--- fixes for KDE build. ---#
 echo 'Copying KDE package configuration...'
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.license/zr-kde-apps
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/zr-kde-apps
 EOF
 
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.accept_keywords/zq-pidgin-indicator
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.accept_keywords/zq-pidgin-indicator
 =x11-plugins/pidgin-indicator-1.0 ~amd64
 EOF
 
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.license/zs-kde
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/zs-kde
 >=media-libs/faac-1.29.9.2 MPEG-4
 =net-misc/dropbox-48.3.56 CC-BY-ND-3.0 dropbox
 EOF
 
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.accept_keywords/zr-kde
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.accept_keywords/zr-kde
 >=dev-libs/openssl-1.1.1c-r1 ~amd64
 EOF
  
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.use/zw-kde
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/zw-kde
 >=dev-lang/python-2.7.15:2.7 sqlite
 >=x11-libs/libdrm-2.4.97 libkms
 >=net-libs/telepathy-qt-0.9.7-r1 farstream
@@ -347,11 +370,11 @@ EOF
 
 #-- fxies for nvidia --#
 echo 'Copying nvidia package configuration...'
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.license/nvidia-drivers
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/nvidia-drivers
 >=x11-drivers/nvidia-drivers-430.40 NVIDIA-r2
 EOF
 
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.use/zy-nvidia-drivers
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/zy-nvidia-drivers
 >=x11-libs/gdk-pixbuf-2.38.1 X
 >=x11-libs/pango-1.42.4-r1 X
 >=x11-libs/libX11-1.6.8 abi_x86_32
@@ -370,18 +393,18 @@ EOF
 
 #--- fixes for kernel and grub ---#
 echo 'Copying kernel and grub package configuration...'
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.license/kernel
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/kernel
 app-arch/unrar unRAR
 sys-kernel/linux-firmware @BINARY-REDISTRIBUTABLE
 sys-firmware/intel-microcode intel-ucode
 EOF
 
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.accept_keywords/sys-kernel
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.accept_keywords/sys-kernel
 =sys-kernel/ck-sources-5.1.7 ~amd64
 =sys-kernel/linux-headers-5.1 ~amd64
 EOF
 
-cat <<'EOF' > /mnt/gentoo/etc/portage/package.use/zx-grub-2
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/zx-grub-2
 >=sys-boot/grub-2.02-r4 mount device-mapper fonts theme truetype
 EOF
 
@@ -482,7 +505,7 @@ eselect profile set 5
 emerge app-portage/cpuid2cpuflags mirrorselect
 
 echo 'Copying portage make.conf template'
-cat <<'EOF' > /mnt/gentoo/etc/portage/make.conf
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/make.conf
 COMMON_FLAGS="-O2 -pipe"
 CFLAGS="${COMMON_FLAGS}"
 CXXFLAGS="${COMMON_FLAGS}"
@@ -521,28 +544,30 @@ EOF
 #
 echo "Autogenerating make.conf..."
 echo 'Setting MAKEOPTS...'
-perl -pi -e 's|(MAKEOPTS\=\")(.*)(")|${1}-j'$(perl -e'use POSIX; print ceil('$(nproc --all)'*0.5);')' -l'$(perl -e'use POSIX; print floor('$(nproc --all)'*0.9);')'${3}|g;' /mnt/gentoo/etc/portage/make.conf
+perl -pi -e 's|(MAKEOPTS\=\")(.*)(")|${1}-j'$(perl -e'use POSIX; print ceil('$(nproc --all)'*0.5);')' -l'$(perl -e'use POSIX; print floor('$(nproc --all)'*0.9);')'${3}|g;' $CHROOT_MOUNT/etc/portage/make.conf
 echo 'Setting COMMON_FLAGS...'
-perl -pi -e 's|(COMMON\_FLAGS\=\")(.*)(")|${1}-march='$(gcc -march=native -Q --help=target | grep -- '-march=' | cut -f3)' -O2 -pipe${3}|g;' /mnt/gentoo/etc/portage/make.conf
+perl -pi -e 's|(COMMON\_FLAGS\=\")(.*)(")|${1}-march='$(gcc -march=native -Q --help=target | grep -- '-march=' | cut -f3)' -O2 -pipe${3}|g;' $CHROOT_MOUNT/etc/portage/make.conf
 echo 'Setting CPU_FLAGS_X86...'
-cmd='s|(CPU\_FLAGS\_X86\=\")(.*)(")|${1}'$(cpuid2cpuflags | cut -d' ' -f 2-)'${3}|g;'; perl -pi -e "$cmd" /mnt/gentoo/etc/portage/make.conf
+cmd='s|(CPU\_FLAGS\_X86\=\")(.*)(")|${1}'$(cpuid2cpuflags | cut -d' ' -f 2-)'${3}|g;'; perl -pi -e "$cmd" $CHROOT_MOUNT/etc/portage/make.conf
 echo 'Setting GENTOO_MIRRORS...'
-cmd='s|(GENTOO\_MIRRORS\=\")(.*)(")|${1}'$(mirrorselect -b50 -s3 -R 'North America' -q -o 2>/dev/null | perl -p -e 's|(GENTOO\_MIRRORS\=\")(.*)(")|${2}|g' | awk '{printf $0}')'${3}|g'; perl -pi -e "$cmd" /mnt/gentoo/etc/portage/make.conf
+cmd='s|(GENTOO\_MIRRORS\=\")(.*)(")|${1}'$(mirrorselect -b50 -s3 -R 'North America' -q -o 2>/dev/null | perl -p -e 's|(GENTOO\_MIRRORS\=\")(.*)(")|${2}|g' | awk '{printf $0}')'${3}|g'; perl -pi -e "$cmd" $CHROOT_MOUNT/etc/portage/make.conf
 
 #- Fstab -#
 # Put the knife down, dave!
 #
 echo 'Copying fstab...'
-cat <<'EOF' > /mnt/gentoo/etc/fstab
-/dev/nvme0n1p1                      /boot/efi        vfat              noatime                                                                             0 2
-/dev/mapper/gentoo-swap             none             swap              sw                                                                                  0 0
-/dev/mapper/gentoo-linux_root       /                xfs               rw,noatime,attr2,inode64,noquota                                                    0 1
-/dev/mapper/gentoo-linux_home       /home            ext4              rw,noatime,noquota                                                                  0 1
-/dev/mapper/gentoo-var_log          /var/log         ext4              rw,noatime                                                                          0 2
-tmpfs                               /tmp             tmpfs             rw,nosuid,noatime,nodev,mode=1777                                                   0 2
-tmpfs                               /var/tmp         tmpfs             rw,nosuid,noatime,nodev,mode=1777,size=16G                                          0 0
-tmpfs                               /var/tmp/portage tmpfs             rw,nosuid,noatime,nodev,mode=755,size=16G,uid=portage,gid=portage,x-mount.mkdir=755 0 0
-efivarfs                            /sys/firmware/efi/efivars efivarfs rw,nosuid,nodev,noexec,relatime                                                     0 0
+
+# variable-expanded here-document.  Notice the lack of single quotes around EOF.
+cat <<EOF > $CHROOT_MOUNT/etc/fstab
+$BOOT_DEVICE /boot/efi vfat noatime 0 2
+$SWAP_MOUNT none swap sw 0 0
+$ROOT_MOUNT / xfs rw,noatime,attr2,inode64,noquota 0 1
+$HOME_MOUNT /home ext4 rw,noatime,noquota 0 1
+$VARLOG_MOUNT /var/log ext4 rw,noatime 0 2
+tmpfs /tmp tmpfs rw,nosuid,noatime,nodev,mode=1777 0 2
+tmpfs /var/tmp tmpfs rw,nosuid,noatime,nodev,mode=1777,size=16G 0 0
+tmpfs /var/tmp/portage tmpfs rw,nosuid,noatime,nodev,mode=755,size=16G,uid=portage,gid=portage,x-mount.mkdir=755 0 0
+efivarfs /sys/firmware/efi/efivars efivarfs rw,nosuid,nodev,noexec,relatime 0 0
 EOF
 
 msg_anim 'Chroot' 'The next stage of the installer runs in the chroot.' '5'
@@ -554,7 +579,7 @@ msg_anim 'Chroot' 'is reached' '5'
 # Its dark down here.  Notepad++ syntax highlighting fucks itself over here documents
 # Its why I had the most trouble with the chroot junk.
 #
-cat <<'INNERSCRIPT' >/mnt/gentoo/root/chroot_inner_script.sh
+cat <<'INNERSCRIPT' >$CHROOT_MOUNT/root/chroot_inner_script.sh
 #!/bin/bash
 
 env-update
@@ -576,16 +601,6 @@ locale-gen
 
 #- set up our system profile -#
 eselect profile set 23
-
-#- Bootstrap the system with the new make.conf and profile -#
-# This is the recompile the compiler gag we toss around at work.
-/usr/portage/scripts/bootstrap.sh && emerge -e system
-
-#- PORTAGE SHIT -#
-# Its the good kind.  Useful portage tools.  Also, use layman to add the kde group, we'll need it
-# later on...
-emerge app-portage/eix app-portage/gentoolkit app-portage/genlop app-portage/portage-utils app-portage/layman 
-layman --fetch --add kde
 
 #- THE KINKY BITS -#
 # The pajamas are comin' off!
@@ -6285,8 +6300,15 @@ cd ~
 # Gotta prepare, get it all nice and-
 umount -v efivarfs && mount -v efivarfs 
 
+#- IS IT XORG -#
+# Or is it ZORBG! What ever it is, we need it for the graphics, and a display manager to look pretty and junk
+# 
+emerge x11-base/xorg-drivers x11-base/xorg-server x11-apps/xinit net-misc/x11-ssh-askpass x11-drivers/nvidia-drivers 
+nvidia-xconfig
+eselect opengl set nvidia
+
 #- INITRAMFS -#
-emerge dracut lvm2 sys-firmware/intel-microcode sys-firmware/alsa-firmware sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-fs/udisks sys-auth/polkit sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate acpi acpid x11-drivers/nvidia-drivers
+emerge dracut lvm2 linux-firmware sys-firmware/intel-microcode sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate acpi acpid 
 env-update
 dracut --kver 5.1.7-ck -H --add "lvm dm" --add-drivers "efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci" -i /lib/firmware /lib/firmware --hostonly-cmdline --fstab --gzip --lvmconf --early-microcode --force /boot/initramfs-5.1.7-ck.img
 
@@ -6296,47 +6318,118 @@ cat <<'EOFDOC' > /etc/default/grub
 GRUB_DISTRIBUTOR="Gentoo"
 GRUB_CMDLINE_LINUX="rd.auto=1"
 EOFDOC
-grub-install /dev/nvme0n1 --efi-directory=/boot/efi --target=x86_64-efi --no-floppy
+grub-install $OS_DEVICE --efi-directory=/boot/efi --target=x86_64-efi --no-floppy
 grub-mkconfig -o /boot/grub/grub.cfg
 
-#- IS IT XORG -#
-# Or is it ZORBG! What ever it is, we need it for the graphics, and a display manager to look pretty and junk
-# 
-emerge x11-base/xorg-drivers x11-base/xorg-server x11-apps/xinit app-arch/unrar x11-misc/sddm net-misc/x11-ssh-askpass
-nvidia-xconfig
-eselect opengl set nvidia
+#- CONFIGURE SERVICES -#
+sed -i 's/threaded(yes)/threaded(no)/g' /etc/syslog-ng/syslog-ng.conf 
+cat <<'EOFDOC' > /etc/syslog-ng/syslog-ng.conf
+@version: 3.22
+#
+# Syslog-ng default configuration file for Gentoo Linux
+
+# https://bugs.gentoo.org/426814
+@include "scl.conf"
+
+options {
+    threaded(yes);
+    chain_hostnames(no);
+
+    # The default action of syslog-ng is to log a STATS line
+    # to the file every 10 minutes.  That's pretty ugly after a while.
+    # Change it to every 12 hours so you get a nice daily update of
+    # how many messages syslog-ng missed (0).
+    stats_freq(43200);
+    # The default action of syslog-ng is to log a MARK line
+    # to the file every 20 minutes.  That's seems high for most
+    # people so turn it down to once an hour.  Set it to zero
+    # if you don't want the functionality at all.
+    mark_freq(3600);
+};
+
+source src { system(); internal(); };
+
+destination messages { file("/var/log/messages"); };
+
+# By default messages are logged to tty12...
+destination console_all { file("/dev/tty12"); };
+# ...if you intend to use /dev/console for programs like xconsole
+# you can comment out the destination line above that references /dev/tty12
+# and uncomment the line below.
+#destination console_all { file("/dev/console"); };
+
+log { source(src); destination(messages); };
+log { source(src); destination(console_all); };
+EOFDOC
+
+#- ENABLE SERVICES -#
+# Without configuring these to start, we won't get past login
+# I went through a broken system's dmesg | grep for a little
+# while to get this list of needy, red headed stepchildren.
+#
+rc-update add syslog-ng default 
+rc-update add cronie default
+rc-update add acpid default
+rc-update add net.$ETH0_DEVICE default
+rc-update add net.$ETH1_DEVICE default
+rc-update add sshd default
+
+#- ROOT PASSWORD -#
+echo 'Enter a new password for root:'
+passwd root
+
+INNERSCRIPT
+
+#- SEX -#
+# Well we put it all in there.  Now we gotta go to town on it~
+#
+chmod +x $CHROOT_MOUNT/root/chroot_inner_script.sh
+chroot $CHROOT_MOUNT/ /bin/bash /root/chroot_inner_script.sh
+
+# here document with variable expansion.  Notice the lack of quotation marks around INNERSCRIPT
+# This tape will self-destruct in 3 hours.  Roger roger
+cat <<INNERSCRIPT >$CHROOT_MOUNT/etc/profile.d/boot_kicker.sh
+#!/bin/bash
+. /home/$USERNAME/bootstrap.sh '$USERNAME' '$PASSWORD'
+rm -f /home/$USERNAME/bootstrap.sh
+rn -f /etc/profile.d/boot_kicker.sh
+reboot
+INNERSCRIPT
+
+cat <<'INNERSCRIPT' >$CHROOT_MOUNT/home/$USERNAME/bootstrap.sh
+#!/bin/bash
+
+USERNAME="$1"
+PASSWORD="$2"
+
+#- STRAPPIN BOOTS -#
+#- Bootstrap the system with the new make.conf and profile -#
+# This is the recompile the compiler gag we toss around at work.
+echo 'Running bootstrapper to optimize compilers...'
+/usr/portage/scripts/bootstrap.sh && emerge -e system
+
+#- PORTAGE SHIT -#
+# Its the good kind.  Useful portage tools.  Also, use layman to add the kde group, we'll need it
+# later on...
+echo 'Installing portage extensions...'
+emerge app-portage/eix app-portage/gentoolkit app-portage/genlop app-portage/portage-utils app-portage/layman 
+layman --fetch --add kde
+
+#- ALSA AND PULSE -#
+echo 'Installing alsa and pulseaudio...'
+emerge alsa-utils media-libs/alsa-lib alsa-plugins alsa-tools pulseaudio
 
 #- THIS PART SUCKS -#
 # Its the reason the script takes 9 hours.  Emerge KDE, don't shit yourself, okay?
 # Get up and move around if ya need to.  Beat off to my videos.  Or somethin...
 #
-emerge kde-plasma/plasma-meta kde-plasma/kdeplasma-addons @kde-plasma @kde-frameworks @kdeutils
+echo 'Installing display manager...'
+emerge sys-fs/udisks sys-auth/polkit app-arch/unrar x11-misc/sddm 
+echo 'Installing KDE Plasma...'
+emerge kde-plasma/plasma-meta kde-plasma/kdeplasma-addons 
 emerge --changed-use kde-plasma/systemsettings
-emerge @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
-cat <<'EOFDOC' > /etc/pam.d/sddm
-#%PAM-1.0
-
-auth            include         system-login
--auth           optional        pam_gnome_keyring.so
--auth           optional        pam_kwallet5.so
-
-account         include         system-login
-
-password        include         system-login
--password       optional        pam_gnome_keyring.so use_authtok
-
-session         optional        pam_keyinit.so force revoke
-session         include         system-login
--session        optional        pam_gnome_keyring.so auto_start
--session        optional        pam_kwallet5.so auto_start
-EOFDOC
-usermod -a -G video sddm
-cat <<'EOFDOC' > /etc/conf.d/xdm
-DISPLAYMANAGER="sddm"
-EOFDOC
-
-#- sound -#
-emerge alsa-utils
+echo 'Upgrade to Plasma 5 stable / apps...'
+emerge @kde-plasma @kde-frameworks @kdeutils @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
 
 #- SUDO OFF, SUDO ON -#
 # Its like a flavor of martial arts or somethin
@@ -6443,124 +6536,89 @@ root ALL=(ALL) ALL
 #includedir /etc/sudoers.d
 EOFDOC
 
-useradd heavypaws -g users -G wheel,video,audio,root,sys,disk,adm,sddm,bin,daemon,tty,portage,console,plugdev,usb,cdrw,cdrom,input,lp,uucp -d /home/heavypaws -s /bin/bash 
-mkdir /home/heavypaws 
-cp -a /etc/skel/. /home/heavypaws/.
-chown -R heavypaws /home/heavypaws
-echo 'Please enter new password for user account:'
-passwd heavypaws
+echo 'Setting up user account: '"$USERNAME"
+useradd $USERNAME -g users -G wheel,video,audio,root,sys,disk,adm,sddm,bin,daemon,tty,portage,console,plugdev,usb,cdrw,cdrom,input,lp,uucp -d /home/$USERNAME -s /bin/bash 
+mkdir /home/$USERNAME
+cp -a /etc/skel/. /home/$USERNAME/.
+chown -R $USERNAME /home/$USERNAME
+echo -e "$PASSWORD\n$PASSWORD" | passwd $USERNAME
 
-#- USER STUFF -#
-sed -i 's/threaded(yes)/threaded(no)/g' /etc/syslog-ng/syslog-ng.conf 
-cat <<'EOFDOC' > /etc/syslog-ng/syslog-ng.conf
-@version: 3.22
-#
-# Syslog-ng default configuration file for Gentoo Linux
+#- DISPLAY MANAGER CONFIG -#
+echo 'Configuring X session...'
+cat <<'EOFDOC' > /etc/env.d/90xsession
+XSESSION="KDE-5"
+EOFDOC
+cat <<'EOFDOC' > /home/$USERNAME/.xinitrc
+exec ck-launch-session dbus-launch --sh-syntax --exit-with-session startkde
+EOFDOC
+echo 'Copying X session config to skeleton directory...'
+cp /home/$USERNAME/.xinitrc /etc/skel
+chown $USERNAME /home/$USERNAME/.xinitrc
+echo 'Configuring SDDM...'
+cat <<'EOFDOC' > /etc/pam.d/sddm
+#%PAM-1.0
 
-# https://bugs.gentoo.org/426814
-@include "scl.conf"
+auth            include         system-login
+-auth           optional        pam_gnome_keyring.so
+-auth           optional        pam_kwallet5.so
 
-options {
-    threaded(yes);
-    chain_hostnames(no);
+account         include         system-login
 
-    # The default action of syslog-ng is to log a STATS line
-    # to the file every 10 minutes.  That's pretty ugly after a while.
-    # Change it to every 12 hours so you get a nice daily update of
-    # how many messages syslog-ng missed (0).
-    stats_freq(43200);
-    # The default action of syslog-ng is to log a MARK line
-    # to the file every 20 minutes.  That's seems high for most
-    # people so turn it down to once an hour.  Set it to zero
-    # if you don't want the functionality at all.
-    mark_freq(3600);
-};
+password        include         system-login
+-password       optional        pam_gnome_keyring.so use_authtok
 
-source src { system(); internal(); };
-
-destination messages { file("/var/log/messages"); };
-
-# By default messages are logged to tty12...
-destination console_all { file("/dev/tty12"); };
-# ...if you intend to use /dev/console for programs like xconsole
-# you can comment out the destination line above that references /dev/tty12
-# and uncomment the line below.
-#destination console_all { file("/dev/console"); };
-
-log { source(src); destination(messages); };
-log { source(src); destination(console_all); };
+session         optional        pam_keyinit.so force revoke
+session         include         system-login
+-session        optional        pam_gnome_keyring.so auto_start
+-session        optional        pam_kwallet5.so auto_start
+EOFDOC
+usermod -a -G video sddm
+cat <<'EOFDOC' > /etc/conf.d/xdm
+DISPLAYMANAGER="sddm"
 EOFDOC
 
-#- SERVICES -#
-# Without configuring these to start, we won't get past login
-# I went through a broken system's dmesg | grep for a little
-# while to get this list of needy, red headed stepchildren.
-#
-rc-update add syslog-ng default 
-rc-update add cronie default
-rc-update add net.enp10s0 default
-rc-update add net.enp0s31f6 default
-rc-update add dbus boot
+#- KDE SERVICES -#
+echo 'Enabling KDE Plasma services...'
 rc-update add consolekit default
+rc-update add alsasound boot
+rc-update add dbus boot
 rc-update add udisks default
-rc-update add acpid default
 rc-update add xdm default
 
 #- WORLD SYNC -#
-#- Finally, lock in our changes to the system by syncing them with world group!
-emerge --deep --newuse @world
+echo 'Syncing @world...'
+emerge @world
 
+#- Drop exection back to the bootstrap wrapper. -#
 INNERSCRIPT
 
-#- SEX -#
-# Well we put it all in there.  Now we gotta go to town on it~
+#- MAKE SURE THEY'RE EXECUTABLE -#
+# Boots gotta run! - Uh, I thought this pun was good when I wrote this comment.
+#                    Shitty YouTube channels by dads with bad puns, what did you expect?
 #
-chmod +x /mnt/gentoo/root/chroot_inner_script.sh
-chroot /mnt/gentoo/ /bin/bash /root/chroot_inner_script.sh
+chmod +x $CHROOT_MOUNT/etc/profile.d/boot_kicker.sh
+chmod +x $CHROOT_MOUNT/home/$USERNAME/bootstrapper.sh
 
-msg_anim 'Reboot' 'YAY!  You made it all the way to the end.' '5'
-msg_anim 'Reboot' 'After we reboot, we will see the display manager come up to greet us.' '5'
-msg_anim 'Reboot' 'And then I can sleep!' '5'
-msg_anim 'Reboot' 'Lets just unmount all of our partitions, first.' '5'
+#- SWEEP THE FLOOR -#
+# Cos I'm not getting my boots dirty.
+#
+rm -f $CHROOT_MOUNT/root/*.xz
+rm -f $CHROOT_MOUNT/root/*.sh
+umount -l $CHROOT_MOUNT/sys
+umount -l $CHROOT_MOUNT/proc
+umount $CHROOT_MOUNT/dev/pts
+umount $CHROOT_MOUNT/dev/shm
+umount -l $CHROOT_MOUNT/dev
+umount -l $CHROOT_MOUNT/var/tmp/portage
+umount -l $CHROOT_MOUNT/var/tmp
+umount -l $CHROOT_MOUNT/var/log
+umount -l $CHROOT_MOUNT/boot/efi
+umount -l $CHROOT_MOUNT/tmp
+umount -l $CHROOT_MOUNT/home
+umount -l $CHROOT_MOUNT
 
-rm -f /mnt/gentoo/root/*.xz
-rm -f /mnt/gentoo/root/*.sh
-
-#- HRRF~ -#
-# he's done so unmount him.  careful now.
-umount -l /mnt/gentoo/sys
-umount -l /mnt/gentoo/proc
-umount /mnt/gentoo/dev/pts
-umount /mnt/gentoo/dev/shm
-umount -l /mnt/gentoo/dev
-umount -l /mnt/gentoo/var/tmp/portage
-umount -l /mnt/gentoo/var/tmp
-umount -l /mnt/gentoo/var/log
-umount -l /mnt/gentoo/boot/efi
-umount -l /mnt/gentoo/tmp
-umount -l /mnt/gentoo/home
-umount -l /mnt/gentoo
-
-#- NAMES -#
-# Peopke that I love
-# You can delete all these, these messages where for the video
-# None of the names mean much, they've been shortened up or changed
-msg_anim 'Final Words' 'The source code for this script is available in the description.' '5'
-msg_anim 'Final Words' 'Its designed for my machine, but I hope that it can be a guide...' '5'
-msg_anim 'Final Words' '...for those of you open source enthusiests out there.' '5'
-msg_anim 'Yay For Sleep' 'My bed is going to eat me now!' '5'
-msg_anim 'Yay For Sleep' '~ Luv HeavyPaws' '5'
-msg_anim 'Greetz' 'What would a starfield be without them?' '5'
-msg_anim 'Greetz' 'yucked | jenci | gaiv | strongest9' '2'
-msg_anim 'Greetz' 'frost | caff | katelyn | rose' '2'
-msg_anim 'Greetz' 'aaron | burr | verag | tank  | lo' '2'
-msg_anim 'Greetz' 'baxter | hunter | jelly | alek' '2'
-msg_anim 'Greetz' 'adri | november | shadow | soren' '2'
-msg_anim 'Greetz' 'archaeous | alpho | vblast | vgm' '2'
-msg_anim 'Greetz' 'harvey | lo' '2'
-msg_anim 'Greetz' 'Music for this video provided by Lo.' '5'
-msg_anim 'Greetz' '... and you! ...' '5'
-msg_anim 'Thank You' '... Thanks for Watching! ...' '5'
+#- SPLENDID PROCESS -#
+reboot
 
 #- BED TIME STORY -#
 # We installed gentoo today.  There was a big mess to clean up.
