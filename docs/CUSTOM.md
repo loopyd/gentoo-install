@@ -96,7 +96,7 @@ You can custimze some of the script's network configuration using these options.
 ``DNS1_ADDRESS`` | Primary DNS server | ``8.8.8.8`` | No
 ``DNS2_ADDRESS`` | Secondary DNS server | ``8.8.4.4`` | No
 
-[3] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
+[4] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 
 ### Account Credentials
 
