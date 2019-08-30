@@ -46,6 +46,8 @@ If you have success, your machine's IP address can be obtained by running the fo
 ```
 If you do not have a network configuration (ping fails), you will have to follow the [Guide](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Networking) on the Gentoo Wiki
 
+### Obtaining an SSH Client
+
 You will need an **SSH client** to execute the script.
 
 You can use **PuTty** -> [link](https://www.chiark.greenend.org.uk/~sgtatham/putty/) as an SSH client.
