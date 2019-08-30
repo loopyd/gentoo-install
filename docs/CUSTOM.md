@@ -85,7 +85,7 @@ You can custimze some of the script's network configuration using these options.
 
 | Option | Use | Default | Autovar[4]
 | --- | --- | --- | --- |
-``MIRROR_SERVER_ADDRESS`` | ``links`` will use this IP address to call up a LAN http server.  You should host your files on it for download. | ``192.168.1.103`` | No
+``MIRROR_SERVER_ADDRESS`` | ``links`` will use this address to call up a tarballl mirror page.  I have this set to a LAN IP to host locally. | ``192.168.1.103`` | No
 ``ETH0_DEVICE`` | First Ethernet adapter device name | ``enp10s0`` | No
 ``ETH0_ADDRESS`` | First Ethernet adapter static IP | ``192.168.1.104`` | No
 ``ETH0_NETMASK`` | First Ethernet adapter netmask | ``255.255.254.0`` | No
