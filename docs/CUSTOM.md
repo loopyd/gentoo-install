@@ -75,7 +75,7 @@ You can change some details of the default user account that is created during t
 | --- | --- | --- | --- |
 USERNAME | Default user account name | ``heavypaws`` | Yes
 PASSWORD | Default user account password | ``12345`` | Yes
-ROOT_PASSWORD | Default root password | "123456" | Yes
+ROOT_PASSWORD | Default root password | ``123456`` | Yes
 
 [2] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 
