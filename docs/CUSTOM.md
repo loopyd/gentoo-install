@@ -146,3 +146,28 @@ Modify it as need-be.  It links inside of the ``files/`` directory in ``htdocs``
 
 Set ``MIRROR_SERVER_ADDRESS`` in ``gentoo-config.sh`` to the LAN IP of your HTTP server.
 
+### CPU Configuration
+
+This functionality is **in beta**.  Currently, ``sys-firmware/intel-microcode`` is installed for Intel CPUs.  Configuration values do not currently exist for the CPU.  This will change.
+
+**AMD Users**
+
+- ``gentoo-chroot-innerscript.sh`` Install ``sys-firmware/amd-microcode`` instead of ``sys-firmware/intel-microcode`` .
+- ``gentoo-injectconfig.sh`` - ``VIDEO_CARDS`` in ``make.conf`` automakeconf generator.  Remove ``intel`` .
+
+``CPU_FLAGS_X86`` automatic setting has been implimented.  You don't have to worry about configuring this value.  Its done for you.
+
+> **Note:** My apologies for the beta instructions here.  This functionality will become a configuration option soon.
+
+### GPU Configuration
+
+This functionality is **in beta**  Currently, ``nvidia`` proprietary drivers are installed for X.  Modifications will need to be made:
+
+**AMD GPU Users**
+
+- ``gentoo-chroot-innerscript.sh`` Install the X11 AMD drivers instead of the NVIDIA X11 Drivers.
+- ``gentoo-chroot-innerscript.sh`` Remove nvidia-xconfig invocation line.
+- ``gentoo-injectconfig.sh`` Here-docment for ``package.use`` and ``package.license`` ``nvidia`` should be changed so that AMD drivers will install without issues.
+- ``gentoo-injectconfig.sh`` - ``VIDEO_CARDS`` in ``make.conf`` automakeconf generator.  Add ``amd`` or ``radeon`` depending on what you need.
+
+> **Note:** My apologies for the beta instructions here.  This functionality will become a configuration option soon.
