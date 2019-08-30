@@ -1,4 +1,4 @@
-# GentoDad Documentation
+# GentoDAD Documentation
 ## Customization Guide
 
 This script obviously doesn't work with your system.  So some configuration options have been added for you.  The contents of this repository contain a working model for a very particular setup.  To use it for yourself, you will need to customize it.

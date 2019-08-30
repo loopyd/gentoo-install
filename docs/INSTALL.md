@@ -1,4 +1,4 @@
-# GentoDad Documentation
+# GentoDAD Documentation
 ## Installation Guide
 
 To use this script chain, and install gentoo using **GentoDAD**, follow this guide.

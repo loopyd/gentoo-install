@@ -1,4 +1,4 @@
-# GentoDad Documentation
+# GentoDAD Documentation
 ## Table of Contents
 
 1.  [Installation Guide](INSTALL.md) - How to install Gentoo with **GentooDAD**
