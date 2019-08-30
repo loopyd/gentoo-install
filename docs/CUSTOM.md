@@ -21,18 +21,18 @@ You can find these options in ``gentoo-config.sh``.
 
 | Option | Use | Default | Autovar[1]
 | --- | --- | --- | --- |
-``CHROOT_MOUNT`` | Where on the host the chroot will be mounted. | ``/mnt/gentoo`` | No
-``HOME_LABEL`` | LVM label for the ``/home`` partition. | ``linux_home'`` | No
-``ROOT_LABEL`` | LVM label for the ``/`` (root) partition. | ``linux_root`` | No
-``SWAP_LABEL`` | LVM label for the ``swap`` partition. | ``linux_swap`` | No
-``VARLOG_LABEL`` | LVM label for the ``/var/log`` partition. | ``var_log`` | No
-``HOME_MOUNT`` | LVM device mountpoint for the ``home`` partition.  | ``/dev/mapper/gentoo-$HOME_LABEL`` | Yes
-``ROOT_MOUNT`` | LVM device mountpoint for the ``/`` (root) partition. | ``/dev/mapper/gentoo-$ROOT_LABEL`` | Yes
-``SWAP_MOUNT`` | LVM device mountpoint for the ``swap`` partition. | ``/dev/mapper/gentoo-$SWAP_LABEL`` | Yes
-``VARLOG_MOUNT`` | LVM device mountpoint fo the ``/var/log`` partition. | ``/dev/mapper/gentoo-$VARLOG_LABEL`` | Yes
-``BOOT_DEVICE`` | Device path for the ``/boot/efi`` partition. | ``/dev/nvme0n1p1'`` | No
-``LVM_DEVICE`` | Device path for the LVM physical volume. | ``/dev/nvme0n1p2`` | No
-``OS_DEVICE`` | Base device path for Gentoo installation | ``/dev/nvme0n1`` | No
+**CHROOT_MOUNT** | Where on the host the chroot will be mounted. | ``/mnt/gentoo`` | No
+**HOME_LABEL** | LVM label for the ``/home`` partition. | ``linux_home'`` | No
+**ROOT_LABEL** | LVM label for the ``/`` (root) partition. | ``linux_root`` | No
+**SWAP_LABEL** | LVM label for the ``swap`` partition. | ``linux_swap`` | No
+**VARLOG_LABEL** | LVM label for the ``/var/log`` partition. | ``var_log`` | No
+**HOME_MOUNT** | LVM device mountpoint for the ``home`` partition.  | ``/dev/mapper/gentoo-$HOME_LABEL`` | Yes
+**ROOT_MOUNT** | LVM device mountpoint for the ``/`` (root) partition. | ``/dev/mapper/gentoo-$ROOT_LABEL`` | Yes
+**SWAP_MOUNT** | LVM device mountpoint for the ``swap`` partition. | ``/dev/mapper/gentoo-$SWAP_LABEL`` | Yes
+**VARLOG_MOUNT** | LVM device mountpoint fo the ``/var/log`` partition. | ``/dev/mapper/gentoo-$VARLOG_LABEL`` | Yes
+**BOOT_DEVICE** | Device path for the ``/boot/efi`` partition. | ``/dev/nvme0n1p1'`` | No
+**LVM_DEVICE** | Device path for the LVM physical volume. | ``/dev/nvme0n1p2`` | No
+**OS_DEVICE** | Base device path for Gentoo installation | ``/dev/nvme0n1`` | No
 
 [1] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 
@@ -61,9 +61,9 @@ You can modify ``gentoo-config.sh`` underneath the initramfs section accordingly
 
 | Option | Use | Default | Autovar[2]
 | --- | --- | --- | --- |
-``DRACUT_KVER`` | Kernel version | ``5.1.7-ck`` | No
-``DRACUT_MODULES`` | Dracut modules which should load in addition to your host's configuration. | ``lvm dm`` | No
-``DRACUT_KERNEL_MODULES`` | Modules from your kernel which should load accordingly. | ``efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci`` | No
+**DRACUT_KVER** | Kernel version | ``5.1.7-ck`` | No
+**DRACUT_MODULES** | Dracut modules which should load in addition to your host's configuration. | ``lvm dm`` | No
+**DRACUT_KERNEL_MODULES** | Modules from your kernel which should load accordingly. | ``efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci`` | No
 
 [2] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 
@@ -73,9 +73,9 @@ You can customize your system language by editing the locale configuration optio
 
 | Option | Use | Default | Autovar[3]
 | --- | --- | --- | --- |
-``DEFAULT_LOCALE`` | Default language for your system. | ``en_US.UTF-8`` | No
-``LOCALES_TOGEN`` | List of locales to generate. | ``en_US ISO-8859-1``<br/>``en_US.UTF-8 UTF-8`` | No
-``TIMEZONE`` | Default Timezone for the system clock. | ``America/New_York`` | No
+**DEFAULT_LOCALE** | Default language for your system. | ``en_US.UTF-8`` | No
+**LOCALES_TOGEN** | List of locales to generate. | ``en_US ISO-8859-1``<br/>``en_US.UTF-8 UTF-8`` | No
+**TIMEZONE** | Default Timezone for the system clock. | ``America/New_York`` | No
 
 [3] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 
@@ -85,16 +85,16 @@ You can custimze some of the script's network configuration using these options.
 
 | Option | Use | Default | Autovar[4]
 | --- | --- | --- | --- |
-``MIRROR_SERVER_ADDRESS`` | ``links`` will use this address to call up a tarballl mirror page.  I have this set to a LAN IP to host locally. | ``192.168.1.103`` | No
-``ETH0_DEVICE`` | First Ethernet adapter device name | ``enp10s0`` | No
-``ETH0_ADDRESS`` | First Ethernet adapter static IP | ``192.168.1.104`` | No
-``ETH0_NETMASK`` | First Ethernet adapter netmask | ``255.255.254.0`` | No
-``ETH1_DEVICE`` | Second Ethernet adapter device name | ``enp0s31f6`` | No
-``ETH1_ADDRESS`` | Second Ethernet adapter static IP | ``192.168.1.105`` | No
-``ETH1_NETMASK`` | Second Ethernet adapter netmask | ``255.255.254.0`` | No
-``GATEWAY_ADDRESS`` | Gateway IP address | ``192.168.1.1`` | No
-``DNS1_ADDRESS`` | Primary DNS server | ``8.8.8.8`` | No
-``DNS2_ADDRESS`` | Secondary DNS server | ``8.8.4.4`` | No
+**MIRROR_SERVER_ADDRESS** | ``links`` will use this address to call up a tarballl mirror page.  I have this set to a LAN IP to host locally. | ``192.168.1.103`` | No
+**ETH0_DEVICE** | First Ethernet adapter device name | ``enp10s0`` | No
+**ETH0_ADDRESS** | First Ethernet adapter static IP | ``192.168.1.104`` | No
+**ETH0_NETMASK** | First Ethernet adapter netmask | ``255.255.254.0`` | No
+**ETH1_DEVICE** | Second Ethernet adapter device name | ``enp0s31f6`` | No
+**ETH1_ADDRESS** | Second Ethernet adapter static IP | ``192.168.1.105`` | No
+**ETH1_NETMASK** | Second Ethernet adapter netmask | ``255.255.254.0`` | No
+**GATEWAY_ADDRESS** | Gateway IP address | ``192.168.1.1`` | No
+**DNS1_ADDRESS** | Primary DNS server | ``8.8.8.8`` | No
+**DNS2_ADDRESS** | Secondary DNS server | ``8.8.4.4`` | No
 
 [4] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 
@@ -104,9 +104,9 @@ You can change some details of the default user account that is created during t
 
 | Option | Use | Default | Autovar[3]
 | --- | --- | --- | --- |
-USERNAME | Default user account name | ``heavypaws`` | Yes
-PASSWORD | Default user account password | ``12345`` | Yes
-ROOT_PASSWORD | Default root password | ``123456`` | Yes
+**USERNAME** | Default user account name | ``heavypaws`` | Yes
+**PASSWORD** | Default user account password | ``12345`` | Yes
+**ROOT_PASSWORD** | Default root password | ``123456`` | Yes
 
 [2] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 
