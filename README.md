@@ -1,4 +1,4 @@
-# Gentoo Installer
+# GemtooDAD
 This is Loopy's customized Gentoo installer.  Use it at your own risk.  It has been uploaded to github for your observation and lurning purposes.
 
 This script is not a fully working script.  But was designed with one computer in mind.  You can modify it to your heart's contennt.
@@ -7,44 +7,62 @@ Please do offer any forks with improvements to my code, I would appreciate them 
 
 If you want to modify this code, you can do so under the DBAD License:  https://dbad-license.org/
 
------
-## Q/A
-**Did this actually take 3 months?**
-The project was started June 06, 2019.  Its original repository deleted in a fit of rage.  Yes.  :v
+----
+## Customization
 
-**Will this work on my machine?**
-Not without configuring your own kernel, editing its here document, and a few other things.  Gentoo is a learning experience.
-Go learn and stop bothering me !
+This script obviously doesn't work with your system.  So some configuration options have been added for you.  The contents of this repository contain a working model for a very particular setup.  To use it for yourself, you will need to customize it.
 
-**What does it install?**
-- nvidia proprietary
-- kde plasma
-- sddm, and all the goodies
-- lvm partition
-- on an nvme drive
-- custom dracut initramfs
-- custom linux-ck kernel
+You'll need to perform the following steps from a working machine:
 
-**How long does it take?**
-On an 8 thread i7-6700k the installation takes 9:18:17 (timed as an ssh capture), that's **9 hours 18 minutes and 17 seconds**
+1.  Clone this repository
+2.  Follow the rest of the customization guide to tailer the installer to your system.
+3.  Run the script and keep tweaking till it works !
 
-**Are you NUTS?**
-I like nuts.
+Before the hate mail comes, the fun of Gentoo is tweaking and messing around with Linux.
+I have done a lot for you.  The rest is **up to you!**
 
-**Why Gentoo?**
-Fish heads, fish heads, roly poly fish heads.  Fish heads, fish headds, eat em up, yum.
+### Customizing the package configuration
 
-Does that answer your question?
+**Editing the injected configuration**
+To edit the configuration, edit the here documents ( ``cat<<'EOF'`` ) lines in ``gentoo-injectconfig.sh``
 
-I'm sorry, 3 months in a terminal will do that to a person.
+> **Note**: Modifying the here documents that contain variable expansion is touchy.  They look like
+> ``cat <<EOFDOC`` or similar (notice the lack of single quotation marks.  These are automatic heredocs
+> so do so at your own risk.
 
-**I hate you, this destroyed my machine.**
-THat isn't a question.  But I love you, too.  Should have read this document, eh?
+### Adding your own custom kernel
 
-**Can I buy you a cavfefe?**
-You know what to do:  https://paypal.me/snowflowerwolf?locale.x=en_US
+To add your own custom kernel configuration, follow these steps:
 
-**Can I have your phone number?**
-Sure, but it might dissapear in a week.
+1.  Replace the contents of kernel-config.txt with your own.
+2.  Modify ``gentoo-config.sh`` underneath the initramfs section accordingly to load the kernel modules you need.
+- ``DRACUT_KVER`` - Kernel version
+- ``DRACUT_MODULES`` - Dracut modules which should load in addition to your host's configuration.
+- ``DRACUT_KERNEL_MODULES`` - Modules from your kernel which should load accordingly.
+3.  Replace according emerge line in ``gentoo-chroot-innerscript.sh`` to install the sources for the kernel you want to compile.  The default is ``ck-sources`` for **Linux-CK** for optimized desktop systems.
 
------
+> **NOTE**: This script does no sanity checking whatsover, please make sure that your kernel compiles without
+> help first !
+
+----
+## Contributions
+
+You know, developing, testing, and maintaining a big project like this is hard.  Did you know the accumulated unit test time
+for this script is just a little over **3 months**?  Would you like to make a contribution to help make this script better?
+
+This section of the readme details how you can help.
+
+### Want to contribute ?
+
+Fork this repository, and submit a **Merge Pull Request** .
+
+> **TIP:** Please make your changes very clear.  DBAD - You know what that means.
+
+### Want to donate ?
+
+There is no obligation to donate.  However, development of this script did take several months.  If you'd like to, the offer is always open.
+
+**Thank You!**
+
+[Developer PayPal.Me](https://www.paypal.com/paypalme/my/profile?locale.x=en_US&country.x=US)
+----
