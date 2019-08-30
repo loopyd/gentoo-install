@@ -144,5 +144,5 @@ Here is a basic 'Download Page' template you can use for ``index.html``
 
 Modify it as need-be.  It links inside of the ``files/`` directory in ``htdocs`` .  Put the tarballs in that folder, change the filenames, and host your LAN HTTP server on a laptop or another computer.  You can then browse this directory during the install process and quickly download the tarballs over LAN.  (Useful for debugging!)
 
-Set ``MIRROR_SERVER_ADDRESS`` in ``gentoo-script.sh`` to a mirror of your choice from [this page](https://www.gentoo.org/downloads/mirrors/)
+Set ``MIRROR_SERVER_ADDRESS`` in ``gentoo-script.sh`` to the LAN IP of your HTTP server.
 
