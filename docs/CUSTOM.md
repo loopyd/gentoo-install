@@ -67,6 +67,37 @@ You can modify ``gentoo-config.sh`` underneath the initramfs section accordingly
 
 [2] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 
+### Locale
+
+You can customize your system language by editing the locale configuration options in ``gentoo-config.sh``:
+
+| Option | Use | Default | Autovar[3]
+| --- | --- | --- | --- |
+``DEFAULT_LOCALE`` | Default language for your system. | ``en_US.UTF-8`` | No
+``LOCALES_TOGEN`` | List of locales to generate. | ``en_US ISO-8859-1``<br/>``en_US.UTF-8 UTF-8`` | No
+``TIMEZONE`` | Default Timezone for the system clock. | ``America/New_York`` | No
+
+[3] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
+
+### Network
+
+You can custimze some of the script's network configuration using these options.
+
+| Option | Use | Default | Autovar[4]
+| --- | --- | --- | --- |
+``MIRROR_SERVER_ADDRESS`` | ``links`` will use this IP address to call up a LAN http server.  You should host your files on it for download. | ``192.168.1.103`` | No
+``ETH0_DEVICE`` | First Ethernet adapter device name | ``enp10s0`` | No
+``ETH0_ADDRESS`` | First Ethernet adapter static IP | ``192.168.1.104`` | No
+``ETH0_NETMASK`` | First Ethernet adapter netmask | ``255.255.254.0`` | No
+``ETH1_DEVICE`` | Second Ethernet adapter device name | ``enp0s31f6`` | No
+``ETH1_ADDRESS`` | Second Ethernet adapter static IP | ``192.168.1.105`` | No
+``ETH1_NETMASK`` | Second Ethernet adapter netmask | ``255.255.254.0`` | No
+``GATEWAY_ADDRESS`` | Gateway IP address | ``192.168.1.1`` | No
+``DNS1_ADDRESS`` | Primary DNS server | ``8.8.8.8`` | No
+``DNS2_ADDRESS`` | Secondary DNS server | ``8.8.4.4`` | No
+
+[3] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
+
 ### Account Credentials
 
 You can change some details of the default user account that is created during the installation, as well as those for the root user.
@@ -78,4 +109,40 @@ PASSWORD | Default user account password | ``12345`` | Yes
 ROOT_PASSWORD | Default root password | ``123456`` | Yes
 
 [2] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
+
+### Hosting the Installation Tarballs
+
+For hosting the tarballs for the installatiion, you have **a few options**:
+
+#### Using gentoo's mirrors with ``links``:
+
+Set ``MIRROR_SERVER_ADDRESS`` in ``gentoo-script.sh`` to a mirror of your choice from [this page](https://www.gentoo.org/downloads/mirrors/)
+
+No further configuration is required with this method.
+
+#### Hosting the files locally:
+
+You can use a LAN-side HTTP server running on a laptop to host your files.  I used a basic Bitnami WAMP stack.  I left this section of the guide open.
+As long as your server is capable of hosting files and accessable on your LAN, it will work for this step of the installation.
+
+Here is a basic 'Download Page' template you can use for ``index.html``
+
+```
+<!DOCTYPE html>
+<HEAD>
+	<TITLE>Gentoo Install Files</TITLE>
+</HEAD>
+<BODY>
+	<H1>Gentoo Installation Files</H1>
+	<LIST>
+	<LI><A HREF="files/gentoo-install.sh">Installer Script</A></LI>
+	<LI><A HREF="files/stage3-amd64-hardened-20190811T214502Z.tar.xz">Stage 3 Tarball</A></LI>
+	<LI><A HREF="files/portage-latest.tar.xz">Portage Latest Snapshot</A></LI>
+	</LIST>
+</BODY>
+```
+
+Modify it as need-be.  It links inside of the ``files/`` directory in ``htdocs`` .  Put the tarballs in that folder, change the filenames, and host your LAN HTTP server on a laptop or another computer.  You can then browse this directory during the install process and quickly download the tarballs over LAN.  (Useful for debugging!)
+
+Set ``MIRROR_SERVER_ADDRESS`` in ``gentoo-script.sh`` to a mirror of your choice from [this page](https://www.gentoo.org/downloads/mirrors/)
 

@@ -54,6 +54,10 @@ You can use **PuTty** -> [link](https://www.chiark.greenend.org.uk/~sgtatham/put
 
 **Test your connection** with your SSH client at the IP address you obtained before continuing.
 
+### Hosting the installation tarballs
+
+This section is detailed in the [Customization Guide](CUSTOM.md) , as it is part of that step.
+
 ### Uploading the files
 
 Follow the [customization guide](CUSTOM.md).
