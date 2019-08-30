@@ -32,18 +32,18 @@ You may need to press **DEL** or **F12** dependent on your BIOS revision to sele
 You'll need to open an SSH connection to upload the script chain.
 
 When reaching the prompt, enter the following commands:
-   
+```
    rc-service sshd start
    echo -e "yourpassword\nyourpassword" | passwd
-
+```
 You will need the IP address of the machine's main network adapter, you can first test your internet connection by running:
-
+```
     ping -c3 google.com
-
+```
 If you have success, your machine's IP address can be obtained by running the following command:
-
+```
 	ifconfig
-
+```
 If you do not have a network configuration (ping fails), you will have to follow the [Guide](https://wiki.gentoo.org/wiki/Handbook:AMD64/Installation/Networking) on the Gentoo Wiki
 
 You will need an **SSH client** to execute the script.
@@ -71,8 +71,9 @@ WinSCP functions just like an FTP clinet.  The files should be transfered to the
 You can run the installer by **Starting an SSH session**, and logging in as ``root`` with the password you set earlier.
 
 The following commands should be issued after uploading the files.
+```
 	cd /root
 	chmod +x ./*.sh
 	./setup.sh
-	
+```
 Hope for the best!  If you've made a configuration error, the script will exit and show you some output that may help.
