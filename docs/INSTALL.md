@@ -5,7 +5,8 @@ To use this script chain, and install gentoo using **GentoDAD**, follow this gui
 
 ### Creating Gentoo Installation Media
 
-Download a **Gentoo Linux Live Image** -> [link](https://www.gentoo.org/downloads/
+Download a **Gentoo Linux Live Image** -> [link](https://www.gentoo.org/downloads/)
+
 Use **Rufus** in ISO Image Mode.  Use UEFI / Non-CSM mode for the best compatibility with newer systems -> [link](https://rufus.ie/)
 
 ### Motherboard BIOS Configuration
