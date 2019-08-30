@@ -63,7 +63,7 @@ You can modify ``gentoo-config.sh`` underneath the initramfs section accordingly
 | --- | --- | --- | --- |
 ``DRACUT_KVER`` | Kernel version | ``5.1.7-ck`` | No
 ``DRACUT_MODULES`` | Dracut modules which should load in addition to your host's configuration. | ``lvm dm`` | No
-``DRACUT_KERNEL_MODULES`` - Modules from your kernel which should load accordingly. | efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci | No
+``DRACUT_KERNEL_MODULES`` | Modules from your kernel which should load accordingly. | efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci | No
 
 [2] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 
