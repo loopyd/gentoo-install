@@ -105,7 +105,7 @@ rc-update add sshd default
 # This script will not be made executable until reboot time.
 cat <<INNERSCRIPT > /etc/profile.d/gentoo-bootkicker.sh
 #!/bin/bash
-. /root/gentoo-bootstrap.sh
+/root/gentoo-bootstrap.sh
 reboot
 INNERSCRIPT
 chmod +x /etc/profile.d/gentoo-bootkicker.sh
