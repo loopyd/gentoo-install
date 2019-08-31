@@ -22,7 +22,7 @@ msg_anim 'This script is very long' 'Sit back, relax, and enjoy!' '10'
 
 msg_anim 'Chroot' 'The next stage of the installer runs in the chroot.' '5'
 
-. ./gentoo-scriptwrapper.sh 'Running in chroot' "chroot $CHROOT_MOUNT /bin/bash /root/gentoo-chroot-innerscript.sh '$ROOT_PASSWORD' '$ETH0_DEVICE' '$ETH1_DEVICE' '$DRACUT_KVER' '$DRACUT_MODULES' '$DRACUT_KERNEL_MODULES'"
+. ./gentoo-scriptwrapper.sh 'Running in chroot' "chroot $CHROOT_MOUNT /bin/bash /root/gentoo-chroot-innerscript.sh"
 
 msg_anim 'Chroot Finish' 'The remote system will automatically reboot' '5'
 msg_anim 'Chroot Finish' 'Please login as root.' '5'

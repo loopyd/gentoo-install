@@ -179,6 +179,7 @@ cp -f ./gentoo-chroot-innerscript.sh $CHROOT_MOUNT/root/gentoo-chroot-innerscrip
 cp -f ./gentoo-bootstrap.sh $CHROOT_MOUNT/root/gentoo-bootstrap.sh
 cp -f ./gentoo-automakeconf.sh $CHROOT_MOUNT/root/gentoo-automakeconf.sh
 cp -f ./gentoo-kernelcompile.sh $CHROOT_MOUNT/root/gentoo-kernelcompile.sh
+cp -f ./gentoo-autologin.sh $CHROOT_MOUNT/root/gentoo-autologin.sh
 chmod +x $CHROOT_MOUNT/root/*.sh
 
 echo 'Injecting omplete'
