@@ -2,8 +2,6 @@
 
 . /root/gentoo-config.sh
 
-. /root/gentoo-scriptwrapper.sh 'Automakeonf running' '. /root/gentoo-automakeconf.sh'
-
 #- STRAPPIN BOOTS -#
 #- Bootstrap the system with the new make.conf and profile -#
 # This is the recompile the compiler gag we toss around at work.

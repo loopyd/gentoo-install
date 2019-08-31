@@ -19,6 +19,7 @@ msg_anim 'This script is very long' 'Sit back, relax, and enjoy!' '10'
 . ./gentoo-scriptwrapper.sh 'Stage3 setup' '. ./gentoo-stage3.sh'
 . ./gentoo-scriptwrapper.sh 'Mounting tmpfs' '. ./gentoo-mounttmp.sh'
 . ./gentoo-scriptwrapper.sh 'Injecting configuration' '. ./gentoo-injectconfig.sh'
+. ./gentoo-scriptwrapper.sh 'Automakeonf running' '. ./gentoo-automakeconf.sh'
 
 msg_anim 'Chroot' 'The next stage of the installer runs in the chroot.' '5'
 
