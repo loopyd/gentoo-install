@@ -13,13 +13,12 @@ fi
 
 function enable_autologin () {
 
-cat <<EOFDOC > /etc/conf.d/agetty-autologin
+cat <<EOFDOC > /etc/init.d/agetty-autologin
 getty_options="--autologin $AUTOLOGIN_USERNAME --noclear"
 EOFDOC
 	sed -i -e 's/^root:\*/root:/' /etc/shadow
 	rc-config delete agetty
 	cp /etc/init.d/agetty /root/agetty.backup
-	mv /etc/init.d/agetty /etc/init.d/agetty-autologin
 	rc-update add agetty-autologin default 
 }
 
