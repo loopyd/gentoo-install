@@ -114,7 +114,7 @@ echo -e "$ROOT_PASSWORD\n$ROOT_PASSWORD" | passwd root
 
 #- MAKE THE KICKER EXECUTABLE -#
 # This script will not be made executable until reboot time.
-cat <<INNERSCRIPT /etc/profile.d/gentoo-bootkicker.sh
+cat <<INNERSCRIPT > /etc/profile.d/gentoo-bootkicker.sh
 #!/bin/bash
 . /root/gentoo-bootstrap.sh
 rm -f /root/gentoo-bootstrap.sh
