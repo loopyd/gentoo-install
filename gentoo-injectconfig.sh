@@ -3,6 +3,7 @@
 #- UPDATE LIVECD -#
 echo 'Updating LiveCD portage installation...'
 emerge --sync
+eselect profile set 5
 
 #- This here document allows unattended use of portage on the LiveCD, don't change it. -#
 echo 'Inserting base use flag setup for LiveCD...'
