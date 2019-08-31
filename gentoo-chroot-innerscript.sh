@@ -22,15 +22,6 @@ locale-gen
 
 . /root/gentoo-scriptwrapper.sh 'Compiling kernel' '. /root/gentoo-kernelcompile.sh'
 
-. /root/gentoo-scriptwrapper.sh 'Automakeonf running' '. /root/gentoo-automakeconf.sh'
-
-#- STRAPPIN BOOTS -#
-#- Bootstrap the system with the new make.conf and profile -#
-# This is the recompile the compiler gag we toss around at work.
-echo 'Running bootstrapper to optimize compilers...'
-/usr/portage/scripts/bootstrap.sh
-emerge -e system
-
 # This helps.  Its a recommended part of this.  Like lube.  You know.
 # Gotta prepare, get it all nice and-
 umount -v efivarfs && mount -v efivarfs 

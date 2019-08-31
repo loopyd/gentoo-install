@@ -2,6 +2,15 @@
 
 . /root/gentoo-config.sh
 
+. /root/gentoo-scriptwrapper.sh 'Automakeonf running' '. /root/gentoo-automakeconf.sh'
+
+#- STRAPPIN BOOTS -#
+#- Bootstrap the system with the new make.conf and profile -#
+# This is the recompile the compiler gag we toss around at work.
+echo 'Running bootstrapper to optimize compilers...'
+/usr/portage/scripts/bootstrap.sh
+emerge -e system
+
 #- PORTAGE SHIT -#
 # Its the good kind.  Useful portage tools.  Also, use layman to add the kde group, we'll need it
 # later on...
