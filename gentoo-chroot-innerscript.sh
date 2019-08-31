@@ -115,8 +115,8 @@ cat <<INNERSCRIPT > /etc/profile.d/gentoo-bootkicker.sh
 #!/bin/bash
 . /root/gentoo-bootstrap.sh
 rm -f /root/gentoo-bootstrap.sh
-. /root/gentoo-scriptwrapper.sh 'Resetting autologin configuration' '/root/gentoo-autologin.sh "root" "disable"'
 rm -f /etc/profile.d/gentoo-bootkicker.sh
+. /root/gentoo-scriptwrapper.sh 'Resetting autologin configuration' '/root/gentoo-autologin.sh "root" "disable"'
 reboot
 INNERSCRIPT
 chmod +x /etc/profile.d/gentoo-bootkicker.sh

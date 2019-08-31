@@ -16,7 +16,6 @@ function enable_autologin () {
 cat <<EOFDOC > /etc/conf.d/agetty-autologin
 getty_options="--autologin $AUTOLOGIN_USERNAME --noclear"
 EOFDOC
-	cp /etc/shadow /etc/shadow.bak
 	sed -i -e 's/^root:\*/root:/' /etc/shadow
 	rc-config delete agetty.tty1
 	cp /etc/init.d/agetty.tty1 /root/agetty.tty1.backup
@@ -25,8 +24,6 @@ EOFDOC
 }
 
 function disable_autologin () {
-	rm -f /etc/shadow
-	cp /etc/shadow.bak /etc/shadow
 	rc-config delete agetty-autologin.tty1
 	rm -f /etc/init.d/agetty-autologin.tty1 
 	mv /root/agetty.tty1.backup /etc/init.d/agetty.tty1
