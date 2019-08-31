@@ -12,4 +12,4 @@ umount -l $CHROOT_MOUNT/boot/efi
 umount -l $CHROOT_MOUNT/tmp
 umount -l $CHROOT_MOUNT/home
 umount -l $CHROOT_MOUNT
-# reboot
+reboot
