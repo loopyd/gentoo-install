@@ -108,6 +108,7 @@ sys-fs/eudev abi_x86_32
 sys-fs/udisks introspection lvm vdo
 sys-libs/libblockdev vdo lvm
 sys-auth/polkit consolekit introspection
+sys-auth/consolekit policykit acl pm-utils evdev
 >=dev-libs/libpcre2-10.32 pcre16
 >=app-text/xmlto-0.0.28-r1 text
 >=x11-libs/libxcb-1.13.1 xkb

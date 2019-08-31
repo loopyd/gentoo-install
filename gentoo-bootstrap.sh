@@ -18,7 +18,7 @@ emerge alsa-utils media-libs/alsa-lib alsa-plugins alsa-tools pulseaudio
 # Get up and move around if ya need to.  Beat off to my videos.  Or somethin...
 #
 echo 'Installing display manager...'
-emerge sys-fs/udisks sys-auth/polkit app-arch/unrar x11-misc/sddm 
+emerge sys-fs/udisks sys-auth/polkit sys-auth/consolekit x11-misc/sddm 
 echo 'Installing KDE Plasma...'
 emerge kde-plasma/plasma-meta kde-plasma/kdeplasma-addons 
 emerge --changed-use kde-plasma/systemsettings
@@ -142,17 +142,19 @@ echo -e "$PASSWORD\n$PASSWORD" | passwd $USERNAME
 echo -e "$ROOT_PASSWORD\n$ROOT_PASSWORD" | passwd root
 
 #- DISPLAY MANAGER CONFIG -#
-echo 'Configuring X session...'
+echo 'Configuring X session for KDE...'
 cat <<'EOFDOC' > /etc/env.d/90xsession
 XSESSION="KDE-5"
 EOFDOC
 cat <<'EOFDOC' > /home/$USERNAME/.xinitrc
 exec ck-launch-session dbus-launch --sh-syntax --exit-with-session startkde
 EOFDOC
+
 echo 'Copying X session config to skeleton directory...'
 cp /home/$USERNAME/.xinitrc /etc/skel
 chown $USERNAME /home/$USERNAME/.xinitrc
-echo 'Configuring SDDM...'
+
+echo 'Configuring SDDM with kwallet password authentication module...'
 cat <<'EOFDOC' > /etc/pam.d/sddm
 #%PAM-1.0
 
@@ -170,7 +172,10 @@ session         include         system-login
 -session        optional        pam_gnome_keyring.so auto_start
 -session        optional        pam_kwallet5.so auto_start
 EOFDOC
+
+echo 'Adding sddm to video group to prevent performance issues..'
 usermod -a -G video sddm
+echo 'Setting default display manager to sddm'
 cat <<'EOFDOC' > /etc/conf.d/xdm
 DISPLAYMANAGER="sddm"
 EOFDOC
@@ -178,10 +183,12 @@ EOFDOC
 #- KDE SERVICES -#
 echo 'Enabling KDE Plasma services...'
 rc-update add consolekit default
-rc-update add alsasound boot
 rc-update add dbus boot
 rc-update add udisks default
 rc-update add xdm default
+
+echo 'Enabling alsa services...'
+rc-update add alsasound boot
 
 #- WORLD SYNC -#
 echo 'Syncing @world...'

@@ -114,11 +114,17 @@ You can change some details of the default user account that is created during t
 
 For hosting the tarballs for the installatiion, you have **a few options**:
 
-#### Using gentoo's mirrors with ``links``:
+#### Using gentoo's Installation Mirrors with ``links``:
 
 Set ``MIRROR_SERVER_ADDRESS`` in ``gentoo-config.sh`` to a mirror of your choice from [this page](https://www.gentoo.org/downloads/mirrors/)
 
 No further configuration is required with this method.
+
+#### Configuring Portage Mirrors
+
+This is done by region.  You can change ``MIRROR_REGION`` in ``gentoo-config.sh`` to whatever you'd like.  The top 3 fastest mirrors in that region will be selected for you.
+
+The default is ``North America``.
 
 #### Hosting the files locally:
 
@@ -153,21 +159,22 @@ This functionality is **in beta**.  Currently, ``sys-firmware/intel-microcode`` 
 **AMD Users**
 
 - ``gentoo-chroot-innerscript.sh`` Install ``sys-firmware/amd-microcode`` instead of ``sys-firmware/intel-microcode`` .
-- ``gentoo-injectconfig.sh`` - ``VIDEO_CARDS`` in ``make.conf`` automakeconf generator.  Remove ``intel`` .
 
-``CPU_FLAGS_X86`` automatic setting has been implimented.  You don't have to worry about configuring this value.  Its done for you.
+``CPU_FLAGS_X86`` automatic setting.  You don't have to worry about configuring this value.  Its done for you with ``cpuid2cpuflags``
+``ARCH`` and ``USE`` flag for your system arcitechture is configured automatically.  No need to put anything here.
 
 > **Note:** My apologies for the beta instructions here.  This functionality will become a configuration option soon.
 
 ### GPU Configuration
 
-This functionality is **in beta**  Currently, ``nvidia`` proprietary drivers are installed for X.  Modifications will need to be made:
+This functionality is **in beta**  Currently, ``nvidia`` proprietary drivers are installed for X. 
+
+**Update:** GPU ``VIDEO_CARDS`` is configured automatically.  AMD users must still make some changes.  This will change.
 
 **AMD GPU Users**
 
 - ``gentoo-chroot-innerscript.sh`` Install the X11 AMD drivers instead of the NVIDIA X11 Drivers.
 - ``gentoo-chroot-innerscript.sh`` Remove nvidia-xconfig invocation line.
 - ``gentoo-injectconfig.sh`` Here-docment for ``package.use`` and ``package.license`` ``nvidia`` should be changed so that AMD drivers will install without issues.
-- ``gentoo-injectconfig.sh`` - ``VIDEO_CARDS`` in ``make.conf`` automakeconf generator.  Add ``amd`` or ``radeon`` depending on what you need.
 
 > **Note:** My apologies for the beta instructions here.  This functionality will become a configuration option soon.

@@ -16,6 +16,7 @@ OS_DEVICE='/dev/nvme0n1'
 
 #- Network config -#
 MIRROR_SERVER_ADDRESS='192.168.1.103'
+MIRROR_REGION='North America'
 ETH0_DEVICE='enp10s0'
 ETH0_ADDRESS='192.168.1.104'
 ETH0_NETMASK='255.255.254.0'
@@ -41,6 +42,12 @@ ROOT_PASSWORD="p4ssw0rd"
 DRACUT_KVER='5.1.7-ck'
 DRACUT_MODULES='lvm dm'
 DRACUT_KERNEL_MODULES='efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci'
+
+#- System options -#
+# This section is BETA.
+OS_INPUT="libinput joystick mouse"  # needs to be hardcoded
+OS_GUI="kde"                        # unused currently
+OS_BOOT_TYPE="grub"                 # unused currently
 
 #- Internal script settings -#
 # Do not change these
