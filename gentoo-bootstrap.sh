@@ -4,7 +4,7 @@
 
 #- Remove the kicker as our profile will be updated several times -#
 # (Fixes a not-good infinite loop, yea?)
-rn -f /etc/profile.d/gentoo-bootkicker.sh
+rm -f /etc/profile.d/gentoo-bootkicker.sh
 
 #- PORTAGE SHIT -#
 # Its the good kind.  Useful portage tools.  Also, use layman to add the kde group, we'll need it
