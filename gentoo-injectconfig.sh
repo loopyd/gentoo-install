@@ -175,12 +175,7 @@ efivarfs /sys/firmware/efi/efivars efivarfs rw,nosuid,nodev,noexec,relatime 0 0
 EOF
 
 cp -f ./kernel-config.txt $CHROOT_MOUNT/root/kernel-config.txt
-cp -f ./gentoo-config.sh $CHROOT_MOUNT/root/gentoo-config.sh
-cp -f ./gentoo-chroot-innerscript.sh $CHROOT_MOUNT/root/gentoo-chroot-innerscript.sh
-cp -f ./gentoo-bootstrap.sh $CHROOT_MOUNT/root/gentoo-bootstrap.sh
-cp -f ./gentoo-automakeconf.sh $CHROOT_MOUNT/root/gentoo-automakeconf.sh
-cp -f ./gentoo-kernelcompile.sh $CHROOT_MOUNT/root/gentoo-kernelcompile.sh
-cp -f ./gentoo-autologin.sh $CHROOT_MOUNT/root/gentoo-autologin.sh
+cp -f ./*.sh $CHROOT_MOUNT/root
 chmod +x $CHROOT_MOUNT/root/*.sh
 
 echo 'Injecting omplete'
