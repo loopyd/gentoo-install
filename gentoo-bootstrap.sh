@@ -1,4 +1,6 @@
 #!/bin/bash
+rm -f /etc/profile.d/gentoo-bootkicker.sh
+env-update
 
 . /root/gentoo-config.sh
 
@@ -6,6 +8,7 @@
 #- Bootstrap the system with the new make.conf and profile -#
 # This is the recompile the compiler gag we toss around at work.
 echo 'Running bootstrapper to optimize compilers...'
+
 /usr/portage/scripts/bootstrap.sh
 emerge -e system
 
@@ -202,3 +205,6 @@ echo 'Syncing @world...'
 emerge @world
 
 #- Drop exection back to the bootstrap wrapper. -#
+rm -f /root/gentoo-bootstrap.sh
+. /root/gentoo-scriptwrapper.sh 'Resetting autologin configuration' '/root/gentoo-autologin.sh "root" "disable"'
+reboot
