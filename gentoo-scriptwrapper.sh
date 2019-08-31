@@ -64,9 +64,9 @@ sleep 2s
 
 #- CONFUSING BIT -#
 shopt -s nocasematch
-if [[ $WRAPPER_COMMAND =~ ^[.]([[:space:]]*).*$ ]] || [[ $DISPLAY_COMMAND =~ ^source([[:space:]]*).*$ ]]; then
-	{ error=$(. $WRAPPER_COMMAND 2>&1 1>&$out); } {out}>&1
-elif [[ $WRAPPER_COMMAND =~ chroot([[:space:]]*)(.*) ]]; then
+if [[ $WRAPPER_COMMAND =~ ^[.][[:space:]].*$ ]] || [[ $DISPLAY_COMMAND =~ ^source[[:space:]].*$ ]]; then
+	{ error=$($WRAPPER_COMMAND 2>&1 1>&$out); } {out}>&1
+elif [[ $WRAPPER_COMMAND =~ ^chroot[[:space:]].*$ ]]; then
 	$WRAPPER_COMMAND
 else
 	{ error=$($WRAPPER_COMMAND 2>&1 1>&$out); } {out}>&1
