@@ -7,7 +7,6 @@ export PS1="(chroot) $PS1"
 . /root/gentoo-config.sh
 
 emerge-webrsync
-. /root/gentoo-scriptwrapper.sh 'Automakeonf running' '. /root/gentoo-automakeconf.sh'
 
 eselect profile set 23
 emerge app-crypt/openpgp-keys-gentoo-release
@@ -22,6 +21,8 @@ emerge --config sys-libs/timezone-data
 locale-gen
 
 . /root/gentoo-scriptwrapper.sh 'Compiling kernel' '. /root/gentoo-kernelcompile.sh'
+
+. /root/gentoo-scriptwrapper.sh 'Automakeonf running' '. /root/gentoo-automakeconf.sh'
 
 #- STRAPPIN BOOTS -#
 #- Bootstrap the system with the new make.conf and profile -#
