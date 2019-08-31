@@ -7,7 +7,7 @@ export PS1="(chroot) $PS1"
 . /root/gentoo-config.sh
 
 emerge-webrsync
-. /root/gentoo-scriptwrapper.sh 'Automakeonf running' '. /root/gentoo-automakeconf.sh'
+. /root/gentoo-scriptwrapper.sh 'Automakeonf running' '/root/gentoo-automakeconf.sh'
 
 eselect profile set 23
 emerge app-crypt/openpgp-keys-gentoo-release
@@ -107,7 +107,7 @@ rc-update add net.$ETH0_DEVICE default
 rc-update add net.$ETH1_DEVICE default
 rc-update add sshd default
 
-. /root/gentoo-scriptwrapper.sh 'Enabling autologin' '. /root/gentoo-autologin.sh "root" "enable"'
+. /root/gentoo-scriptwrapper.sh 'Enabling autologin' '/root/gentoo-autologin.sh "root" "enable"'
 
 #- MAKE THE KICKER EXECUTABLE -#
 # This script will not be made executable until reboot time.
