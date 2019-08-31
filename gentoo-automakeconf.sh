@@ -3,7 +3,7 @@
 #- AUTO MAKE CONFIGULATOR! -#
 #
 echo 'Emerging cpuinfo2cpuflags and mirrorselect for make.conf autoconfiguration...'
-emerge app-portage/cpuid2cpuflags mirrorselect
+emerge app-portage/cpuid2cpuflags mirrorselect sys-apps/pciutils sys-apps/usbutils
 
 echo 'Copying portage make.conf template'
 cat <<'EOF' > /etc/portage/make.conf
