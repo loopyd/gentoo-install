@@ -107,9 +107,6 @@ rc-update add net.$ETH0_DEVICE default
 rc-update add net.$ETH1_DEVICE default
 rc-update add sshd default
 
-#- ROOT PASSWORD -#
-echo -e "$ROOT_PASSWORD\n$ROOT_PASSWORD" | passwd root
-
 . /root/gentoo-scriptwrapper.sh 'Enabling autologin' '. /root/gentoo-autologin.sh "root" "enable"'
 
 #- MAKE THE KICKER EXECUTABLE -#

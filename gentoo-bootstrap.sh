@@ -142,6 +142,9 @@ cp -a /etc/skel/. /home/$USERNAME/.
 chown -R $USERNAME /home/$USERNAME
 echo -e "$PASSWORD\n$PASSWORD" | passwd $USERNAME
 
+#- ROOT PASSWORD -#
+echo -e "$ROOT_PASSWORD\n$ROOT_PASSWORD" | passwd root
+
 #- DISPLAY MANAGER CONFIG -#
 echo 'Configuring X session...'
 cat <<'EOFDOC' > /etc/env.d/90xsession
