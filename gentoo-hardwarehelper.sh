@@ -98,7 +98,7 @@ function sound_vendors() {
 					  "cirrus logic cs461,cs46xx;"\
 					  "cirrus logic cs462,cs46xx;"\
 					  "cirrus logic cs463,cs46xx;"\
-					  "creative labs sound core3d,ca0132;"\
+					  "sb recon3d,ca0132;"\
 					  "darla20,darla20;"\
 					  "darla24,darla24;"\
 					  "digigram mixart,mixart;"\
@@ -128,10 +128,10 @@ function sound_vendors() {
 					  "rme hammerfall dsp audio,hdsp;"\
 					  "rme hammerfall dsp madi,hdspm;"\
 					  "sega dreamcast,aica;"\
-					  "sound blaster 16,sb16;"\
-					  "sound blaster audigy,emu10k1;"\
-					  "sound blaster awe,sbawe;"\
-					  "sound blaster live,emu10k1;"\
+					  "sb 16,sb16;"\
+					  "sb audigy,emu10k1;"\
+					  "sb awe,sbawe;"\
+					  "sb live,emu10k1;"\
 					  "tascam us,usb-usx2y;"\
 					  "turtle beach maui,wavefront;"\
 					  "turtle beach multisound,msnd-pinnacle;"\

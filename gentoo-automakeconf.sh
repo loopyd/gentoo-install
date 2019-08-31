@@ -3,6 +3,7 @@
 #- AUTO MAKE CONFIGULATOR! -#
 #
 echo 'Emerging cpuinfo2cpuflags and mirrorselect for make.conf autoconfiguration...'
+emerge --sync
 emerge app-portage/cpuid2cpuflags mirrorselect
 
 echo 'Copying portage make.conf template'
@@ -48,11 +49,11 @@ cmd='s|(CPU\_FLAGS\_X86\=\")(.*)(")|${1}'$(cpuid2cpuflags | cut -d' ' -f 2-)'${3
 echo 'Setting GENTOO_MIRRORS...'
 cmd='s|(GENTOO\_MIRRORS\=\")(.*)(")|${1}'$(mirrorselect -b50 -s3 -R "$MIRROR_REGION" -q -o 2>/dev/null | perl -p -e 's|(GENTOO\_MIRRORS\=\")(.*)(")|${2}|g' | awk '{printf $0}')'${3}|g'; perl -pi -e "$cmd" $CHROOT_MOUNT/etc/portage/make.conf
 echo 'Setting ARCH...'
-perl -pi -e 's|(ARCH\=\")(.*)(")|${1}'$(/root/gentoo-hardwarehelper.sh "cpu_arch")'${3}|g;' $CHROOT_MOUNT/etc/portage/make.conf
+cmd='s|(ARCH\=\")(.*)(")|${1}'$(/root/gentoo-hardwarehelper.sh "cpu_arch")'${3}|g;'; perl -pi -e "$cmd" $CHROOT_MOUNT/etc/portage/make.conf
 echo 'Setting VIDEO_CARDS...'
-perl -pi -e 's|(VIDEO\_CARDS\=\")(.*)(")|${1}'$(/root/gentoo-hardwarehelper.sh "gpu_vendors")'${3}|g;' $CHROOT_MOUNT/etc/portage/make.conf
+cmd='s|(VIDEO\_CARDS\=\")(.*)(")|${1}'$(/root/gentoo-hardwarehelper.sh "gpu_vendors")'${3}|g;'; perl -pi -e "$cmd" $CHROOT_MOUNT/etc/portage/make.conf
 echo 'Setting ALSA_CARDS...'
-perl -pi -e 's|(ALSA\_CARDS\=\")(.*)(")|${1}'$(/root/gentoo-hardwarehelper.sh "sound_vendors")'${3}|g;' $CHROOT_MOUNT/etc/portage/make.conf
+cmd='s|(ALSA\_CARDS\=\")(.*)(")|${1}'$(/root/gentoo-hardwarehelper.sh "sound_vendors")'${3}|g;'; perl -pi -e "$cmd" $CHROOT_MOUNT/etc/portage/make.conf
 # TODO: gentoo-hardwarehelper.sh - input_provers
 echo 'Setting INPUT_DEVICES...'
-perl -pi -e 's|(INPUT\_DEVICES\=\")(.*)(")|${1}'$(echo -n "$OS_INPUT")'${3}|g;' $CHROOT_MOUNT/etc/portage/make.conf
+cmd='s|(INPUT\_DEVICES\=\")(.*)(")|${1}'$(echo -n "$OS_INPUT")'${3}|g;'; perl -pi -e "$cmd" $CHROOT_MOUNT/etc/portage/make.conf
