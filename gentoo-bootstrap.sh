@@ -1,17 +1,10 @@
 #!/bin/bash
 
-USERNAME="$1"
-PASSWORD="$2"
+. /root/gentoo-config.sh
 
 #- Remove the kicker as our profile will be updated several times -#
 # (Fixes a not-good infinite loop, yea?)
 rn -f /etc/profile.d/gentoo-bootkicker.sh
-
-#- STRAPPIN BOOTS -#
-#- Bootstrap the system with the new make.conf and profile -#
-# This is the recompile the compiler gag we toss around at work.
-echo 'Running bootstrapper to optimize compilers...'
-/usr/portage/scripts/bootstrap.sh && emerge -e system
 
 #- PORTAGE SHIT -#
 # Its the good kind.  Useful portage tools.  Also, use layman to add the kde group, we'll need it

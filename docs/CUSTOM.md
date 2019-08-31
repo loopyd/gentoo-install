@@ -105,8 +105,8 @@ You can change some details of the default user account that is created during t
 | Option | Use | Default | Autovar[3]
 | --- | --- | --- | --- |
 **USERNAME** | Default user account name | ``heavypaws`` | Yes
-**PASSWORD** | Default user account password | ``12345`` | Yes
-**ROOT_PASSWORD** | Default root password | ``123456`` | Yes
+**PASSWORD** | Default user account password | ``p4ssw0rd`` | Yes
+**ROOT_PASSWORD** | Default root password | ``p4ssw0rd`` | Yes
 
 [2] Autovars are set automatically by **variable expansion**.  You can modify them as you wish, but you should pay attention to where they are used in scripts to avoid bugs.
 

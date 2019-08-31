@@ -44,7 +44,7 @@ function display_msg() {
 	
 	COMMAND="${TEXT_WARNING}${COMMAND}${TEXT_NORMAL}"
 	printf %"$(tput cols)"s |tr " " "="
-	printf "%-60s %40s\n" "  $MSG" "${COMMAND}"
+	printf "%-40s %40s\n" "  $MSG" "${COMMAND}"
 	printf %"$(tput cols)"s |tr " " "="
 	echo -e "\n"
 	
@@ -67,7 +67,7 @@ shopt -s nocasematch
 if [[ $WRAPPER_COMMAND =~ ^[.]([[:space:]]*).*$ ]] || [[ $DISPLAY_COMMAND =~ ^source([[:space:]]*).*$ ]]; then
 	{ error=$(. $WRAPPER_COMMAND 2>&1 1>&$out); } {out}>&1
 elif [[ $WRAPPER_COMMAND =~ chroot([[:space:]]*)(.*) ]]; then
-	{ error=$($WRAPPER_COMMAND 2>&1 1>&$out); } {out}>&1
+	$WRAPPER_COMMAND
 else
 	{ error=$($WRAPPER_COMMAND 2>&1 1>&$out); } {out}>&1
 fi

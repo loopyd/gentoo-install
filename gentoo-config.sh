@@ -34,8 +34,8 @@ TIMEZONE='America/New_York'
 
 #- Account credential config -#
 USERNAME="heavypaws"
-PASSWORD="12345"
-ROOT_PASSWORD="123456"
+PASSWORD="p4ssw0rd"
+ROOT_PASSWORD="p4ssw0rd"
 
 #- Initramfs settings -#
 DRACUT_KVER='5.1.7-ck'

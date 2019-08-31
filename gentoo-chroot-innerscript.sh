@@ -1,18 +1,15 @@
 #!/bin/bash
 
-ROOT_PASSWORD="$1"
-ETH0_DEVICE="$2"
-ETH1_DEVICE="$3"
-DRACUT_KVER="$4"
-DRACUT_MODULES="$5"
-DRACUT_KERNEL_MODULES="6"
-
 env-update
 source /etc/profile
 export PS1="(chroot) $PS1"
 
+. /root/gentoo-config.sh
+
 emerge-webrsync
-env-update
+. /root/gentoo-automakeconf.sh
+
+eselect profile set 23
 emerge app-crypt/openpgp-keys-gentoo-release
 
 #- LOCALE/TIME ZONE -#
@@ -24,22 +21,14 @@ emerge app-crypt/openpgp-keys-gentoo-release
 emerge --config sys-libs/timezone-data
 locale-gen
 
-#- set up our system profile -#
-eselect profile set 23
+. /root/gentoo-kernelcompile.sh
 
-#- THE KINKY BITS -#
-# The pajamas are comin' off!
-emerge =sys-kernel/linux-headers-5.1::gentoo =sys-kernel/ck-sources-5.1.7::gentoo
-
-cd /usr/src/linux
-make clean && make mrproper
-
-#- KERNEL CONFIG -#
-cp -f /root/kernel-config.txt /usr/src/linux/.config
-make -j8
-make modules_install
-make install
-cd ~
+#- STRAPPIN BOOTS -#
+#- Bootstrap the system with the new make.conf and profile -#
+# This is the recompile the compiler gag we toss around at work.
+echo 'Running bootstrapper to optimize compilers...'
+/usr/portage/scripts/bootstrap.sh
+emerge -e system
 
 # This helps.  Its a recommended part of this.  Like lube.  You know.
 # Gotta prepare, get it all nice and-
@@ -54,7 +43,6 @@ eselect opengl set nvidia
 
 #- INITRAMFS -#
 emerge dracut lvm2 linux-firmware sys-firmware/intel-microcode sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate acpi acpid 
-env-update
 dracut --kver $DRACUT_KVER -H --add "$DRACUT_MODULES" --add-drivers "$DRACUT_KERNEL_MODULES" -i /lib/firmware /lib/firmware --hostonly-cmdline --fstab --gzip --lvmconf --early-microcode --force /boot/initramfs-5.1.7-ck.img
 
 #- GRUB -#
@@ -120,13 +108,13 @@ rc-update add net.$ETH1_DEVICE default
 rc-update add sshd default
 
 #- ROOT PASSWORD -#
-echo -e "$ROOT_PASSWORD\n\$ROOT_PASSWORD" | passwd root
+echo -e "$ROOT_PASSWORD\n$ROOT_PASSWORD" | passwd root
 
 #- MAKE THE KICKER EXECUTABLE -#
 # This script will not be made executable until reboot time.
 cat <<INNERSCRIPT /etc/profile.d/gentoo-bootkicker.sh
 #!/bin/bash
-. /root/gentoo-bootstrap.sh '$USERNAME' '$PASSWORD'
+. /root/gentoo-bootstrap.sh
 rm -f /root/gentoo-bootstrap.sh
 reboot
 INNERSCRIPT
