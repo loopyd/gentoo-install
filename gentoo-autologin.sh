@@ -17,24 +17,24 @@ cat <<EOFDOC > /etc/conf.d/agetty-autologin
 getty_options="--autologin $AUTOLOGIN_USERNAME --noclear"
 EOFDOC
 	sed -i -e 's/^root:\*/root:/' /etc/shadow
-	rc-config delete agetty.tty1
-	cp /etc/init.d/agetty.tty1 /root/agetty.tty1.backup
-	mv /etc/init.d/agetty.tty1 /etc/init.d/agetty-autologin.tty1 
-	rc-update add agetty-autologin.tty1 default 
+	rc-config delete agetty
+	cp /etc/init.d/agetty /root/agetty.backup
+	mv /etc/init.d/agetty /etc/init.d/agetty-autologin
+	rc-update add agetty-autologin default 
 }
 
 function disable_autologin () {
-	rc-config delete agetty-autologin.tty1
-	rm -f /etc/init.d/agetty-autologin.tty1 
-	mv /root/agetty.tty1.backup /etc/init.d/agetty.tty1
-	rc-update add agetty.tty1 default
+	rc-config delete agetty-autologin
+	rm -f /etc/init.d/agetty-autologin 
+	mv /root/agetty.backup /etc/init.d/agetty
+	rc-update add agetty default
 }
 
 case "$ATUOLOGIN_COMMAND" in
-	enable)
+	*enable*)
 		enable_autologin
 		;;
-	disable)
+	*disable*)
 		disable_autologin
 		;;
 	*)
