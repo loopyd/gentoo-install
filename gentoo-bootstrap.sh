@@ -200,6 +200,26 @@ rc-update add xdm default
 echo 'Enabling alsa services...'
 rc-update add alsasound boot
 
+echo 'Configuring alsa..'
+cat <<'EOFDOC' > /home/$USERNAME/.asoundrc
+'pcm.!default {
+        type hw
+        card 1
+}
+
+ctl.!default {
+        type hw
+        card 1
+}
+EOFDOC
+sed -i -e 's/options.*/options\ cards\_limit=3/g' /etc/modprobe.d/alsa.con
+cat <<'EOFDOC' > /etc/modprobe.d/alsa-base.conf
+options snd_hda_intel position_fix=1 
+EOFDOC
+cp /home/$USERNAME/.asoundrc /etc/skel
+chown $USERNAME /home/$USERNAME/.asoundrc
+
+
 #- WORLD SYNC -#
 echo 'Syncing @world...'
 emerge @world

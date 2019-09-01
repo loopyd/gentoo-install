@@ -41,7 +41,7 @@ ROOT_PASSWORD="p4ssw0rd"
 #- Initramfs settings -#
 DRACUT_KVER='5.1.7-ck'
 DRACUT_MODULES='lvm dm'
-DRACUT_KERNEL_MODULES='efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci'
+DRACUT_KERNEL_MODULES='efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci soundcore snd-hda-core snd-hda-ext-core snd-hda-intel snd-hda-codec snd-hda-codec-ca0132 snd-hda-codec-generic snd-hda-codec-realtek'
 
 #- System options -#
 # This section is BETA.
