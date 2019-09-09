@@ -167,82 +167,32 @@ EOF
 
 #--- fixes for KDE build. ---#
 echo 'Copying KDE package configuration...'
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/zr-kde-apps
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/kde
+media-libs/faac MPEG-4
+net-misc/dropbox CC-BY-ND-3.0 dropbox
 EOF
 
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.accept_keywords/zq-pidgin-indicator
-=x11-plugins/pidgin-indicator-1.0 ~amd64
-EOF
-
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/zs-kde
->=media-libs/faac-1.29.9.2 MPEG-4
-=net-misc/dropbox-48.3.56 CC-BY-ND-3.0 dropbox
-EOF
-
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.accept_keywords/zr-kde
->=dev-libs/openssl-1.1.1c-r1 ~amd64
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.accept_keywords/kde
+dev-libs/openssl ~amd64
+x11-plugins/pidgin-indicator ~amd64
 EOF
  
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/zw-kde
->=dev-lang/python-2.7.15:2.7 sqlite
->=x11-libs/libdrm-2.4.97 libkms
->=net-libs/telepathy-qt-0.9.7-r1 farstream
->=media-plugins/gst-plugins-meta-1.14.3 v4l theora
->=media-libs/gst-plugins-base-1.14.4-r1 theora
->=dev-lang/python-3.6.5 sqlite
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/kde
+dev-lang/python sqlite
+x11-libs/libdrm libkms
+net-libs/telepathy-qt farstream
+media-plugins/gst-plugins-meta v4l theora
+media-libs/gst-plugins-base v4l theora
 kde-plasma/plasma-meta browser-integration crypt display-manager grub gtk pam wallpapers sdk sddm consolekit pm-utils legacy-systray
 kde-plasma/kde-cli-tools kdesu
-sys-fs/eudev abi_x86_32
 sys-fs/udisks introspection lvm vdo
 sys-libs/libblockdev vdo lvm
 sys-auth/polkit consolekit introspection
 sys-auth/consolekit policykit acl pm-utils evdev
->=dev-libs/libpcre2-10.32 pcre16
->=app-text/xmlto-0.0.28-r1 text
->=x11-libs/libxcb-1.13.1 xkb
->=dev-qt/qtcore-5.12.3 icu
+dev-libs/libpcre2 pcre16
+app-text/xmlto text
+x11-libs/libxcb xkb
 EOF
-
-#-- fxies for nvidia --#
-echo 'Copying nvidia package configuration...'
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/nvidia-drivers
->=x11-drivers/nvidia-drivers-430.40 NVIDIA-r2
-EOF
-
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/zy-nvidia-drivers
->=x11-libs/gdk-pixbuf-2.38.1 X
->=x11-libs/pango-1.42.4-r1 X
->=x11-libs/libX11-1.6.8 abi_x86_32
->=x11-libs/libXext-1.3.4 abi_x86_32
->=x11-libs/libvdpau-1.2 abi_x86_32
->=sys-libs/zlib-1.2.11-r2 abi_x86_32
->=x11-libs/cairo-1.16.0-r3 X
->=x11-libs/libxcb-1.13.1 abi_x86_32
->=virtual/pkgconfig-1 abi_x86_32
->=dev-util/pkgconf-1.5.4 abi_x86_32
->=dev-libs/libpthread-stubs-0.4-r1 abi_x86_32
->=x11-libs/libXau-1.0.9 abi_x86_32
->=x11-libs/libXdmcp-1.1.3 abi_x86_32
->=x11-base/xcb-proto-1.13 abi_x86_32
-EOF
-
-#--- fixes for kernel and grub ---#
-echo 'Copying kernel and grub package configuration...'
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/kernel
-app-arch/unrar unRAR
-sys-kernel/linux-firmware @BINARY-REDISTRIBUTABLE
-sys-firmware/intel-microcode intel-ucode
-EOF
-
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.accept_keywords/sys-kernel
-=sys-kernel/ck-sources-5.1.7 ~amd64
-=sys-kernel/linux-headers-5.1 ~amd64
-EOF
-
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/zx-grub-2
->=sys-boot/grub-2.02-r4 mount device-mapper fonts theme truetype
-EOF
-
 
 #- Fstab -#
 # Put the knife down, dave!
