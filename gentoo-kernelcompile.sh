@@ -11,7 +11,7 @@ cat <<EOF > /etc/portage/package.use/sys-boot
 sys-boot/grub mount device-mapper fonts theme truetype
 EOF
 echo 'Injecting package.license for sys-firmware...'
-cat <<EOF >/etc/portage/package.accept_license/sys-firmware
+cat <<EOF >/etc/portage/package.license/sys-firmware
 sys-kernel/linux-firmware @BINARY-REDISTRIBUTABLE
 sys-firmware/intel-microcode intel-ucode
 EOF
