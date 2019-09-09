@@ -38,10 +38,14 @@ USERNAME="heavypaws"
 PASSWORD="p4ssw0rd"
 ROOT_PASSWORD="p4ssw0rd"
 
-#- Initramfs settings -#
-DRACUT_KVER='5.1.7-ck'
+# Kernel config
+KERNEL_RELEASE_VER='gentoo'
+KERNEL_FULL_VER='5.2.8'
+KERNEL_MINOR_VER=$(echo -n $KERNEL_FULL_VER | cut -d'.' -f1-2)
+
+# Dracut config
 DRACUT_MODULES='lvm dm'
-DRACUT_KERNEL_MODULES='efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci soundcore snd-hda-core snd-hda-ext-core snd-hda-intel snd-hda-codec snd-hda-codec-ca0132 snd-hda-codec-generic snd-hda-codec-realtek'
+DRACUT_KERNEL_MODULES='efivarfs igb nvme-core nvme nvidia iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin snd-mixer-oss snd-pcm-oss snd-seq-oss snd-seq-midi-event snd-seq snd-hrtimer snd-hwdep snd-pcm snd-rawmidi snd-seq-device snd-timer snd snd-hda-ext-core snd-hda-core snd-usb-audio snd-usbmidi-lib snd-hda-codec-generic snd-hda-intel snd-usb-audio snd-hda-codec-hdmi snd-hda-codec-ca0132'
 
 #- System options -#
 # This section is BETA.

@@ -20,33 +20,12 @@ emerge app-crypt/openpgp-keys-gentoo-release
 emerge --config sys-libs/timezone-data
 locale-gen
 
+#- KERNEL -#
+# NEW: All of this now automatic and in the wrapper, whew...
 . /root/gentoo-scriptwrapper.sh 'Compiling kernel' '. /root/gentoo-kernelcompile.sh'
 
-# This helps.  Its a recommended part of this.  Like lube.  You know.
-# Gotta prepare, get it all nice and-
-umount -v efivarfs && mount -v efivarfs 
-
-#- IS IT XORG -#
-# Or is it ZORBG! What ever it is, we need it for the graphics, and a display manager to look pretty and junk
-# 
-emerge x11-base/xorg-drivers x11-base/xorg-server x11-apps/xinit net-misc/x11-ssh-askpass x11-drivers/nvidia-drivers 
-nvidia-xconfig
-eselect opengl set nvidia
-
-#- INITRAMFS -#
-emerge dracut lvm2 linux-firmware sys-firmware/intel-microcode sys-boot/grub:2 xfsprogs e2fsprogs os-prober sys-fs/dosfstools sys-apps/usbutils sys-apps/hwinfo sys-fs/eudev sys-process/cronie app-admin/syslog-ng sys-apps/mlocate app-admin/logrotate acpi acpid 
-dracut --kver $DRACUT_KVER -H --add "$DRACUT_MODULES" --add-drivers "$DRACUT_KERNEL_MODULES" -i /lib/firmware /lib/firmware --hostonly-cmdline --fstab --gzip --lvmconf --early-microcode --force /boot/initramfs-5.1.7-ck.img
-
-#- GRUB -#
-# Scrub-a-dub-grub
-cat <<'EOFDOC' > /etc/default/grub
-GRUB_DISTRIBUTOR="Gentoo"
-GRUB_CMDLINE_LINUX="rd.auto=1"
-EOFDOC
-grub-install $OS_DEVICE --efi-directory=/boot/efi --target=x86_64-efi --no-floppy
-grub-mkconfig -o /boot/grub/grub.cfg
-
 #- CONFIGURE SERVICES -#
+emerge app-admin/syslog-ng app-admin/logrotate sys-process/cronie 
 sed -i 's/threaded(yes)/threaded(no)/g' /etc/syslog-ng/syslog-ng.conf 
 cat <<'EOFDOC' > /etc/syslog-ng/syslog-ng.conf
 @version: 3.22
@@ -98,6 +77,10 @@ rc-update add acpid default
 rc-update add net.$ETH0_DEVICE default
 rc-update add net.$ETH1_DEVICE default
 rc-update add sshd default
+
+#- INSTALL XORG BASE -#
+echo 'Installing XORG base...'
+emerge x11-base/xorg-server x11-apps/xinit net-misc/x11-ssh-askpass
 
 . /root/gentoo-scriptwrapper.sh 'Enabling autologin' '. /root/gentoo-autologin.sh "root" "enable"'
 
