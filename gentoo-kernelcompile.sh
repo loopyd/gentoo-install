@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# Kernel config
-KERNEL_RELEASE_VER='gentoo'
-KERNEL_FULL_VER='5.2.8'
-KERNEL_MINOR_VER=$(echo -n $KERNEL_FULL_VER | cut -d'.' -f1-2)
-
-# Dracut config
-DRACUT_MODULES='lvm dm'
-DRACUT_KERNEL_MODULES='efivarfs igb nvme-core nvme nvidia iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin snd-mixer-oss snd-pcm-oss snd-seq-oss snd-seq-midi-event snd-seq snd-hrtimer snd-hwdep snd-pcm snd-rawmidi snd-seq-device snd-timer snd snd-hda-ext-core snd-hda-core snd-usb-audio snd-usbmidi-lib snd-hda-codec-generic snd-hda-intel snd-usb-audio snd-hda-codec-hdmi snd-hda-codec-ca0132'
-
 # Inject portage configurations
 echo 'Injecting package.accept_keywords for sys-kernel...'
 cat <<EOF > /etc/portage/package.accept_keywords/sys-kernel
