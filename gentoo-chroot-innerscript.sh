@@ -1,5 +1,4 @@
 #!/bin/bash
-
 env-update
 source /etc/profile
 export PS1="(chroot) $PS1"
@@ -7,7 +6,6 @@ export PS1="(chroot) $PS1"
 . /root/gentoo-config.sh
 
 emerge-webrsync
-
 eselect profile set 23
 emerge app-crypt/openpgp-keys-gentoo-release
 
@@ -19,6 +17,12 @@ emerge app-crypt/openpgp-keys-gentoo-release
 #
 emerge --config sys-libs/timezone-data
 locale-gen
+
+#- GENTOO ESELECT REPOSITORY -#
+emerge app-eselect/eselect-repository
+mkdir -p /etc/portage/repos.conf/
+eselect repository add gentoo
+emerge --sync
 
 #- KERNEL -#
 # NEW: All of this now automatic and in the wrapper, whew...
@@ -66,6 +70,10 @@ log { source(src); destination(messages); };
 log { source(src); destination(console_all); };
 EOFDOC
 
+#- INSTALL XORG BASE -#
+echo 'Installing XORG base...'
+emerge x11-base/xorg-server x11-apps/xinit net-misc/x11-ssh-askpass
+
 #- ENABLE SERVICES -#
 # Without configuring these to start, we won't get past login
 # I went through a broken system's dmesg | grep for a little
@@ -74,13 +82,8 @@ EOFDOC
 rc-update add syslog-ng default 
 rc-update add cronie default
 rc-update add acpid default
-rc-update add net.$ETH0_DEVICE default
-rc-update add net.$ETH1_DEVICE default
+rc-update add NetworkManager default
 rc-update add sshd default
-
-#- INSTALL XORG BASE -#
-echo 'Installing XORG base...'
-emerge x11-base/xorg-server x11-apps/xinit net-misc/x11-ssh-askpass
 
 . /root/gentoo-scriptwrapper.sh 'Enabling autologin' '. /root/gentoo-autologin.sh "root" "enable"'
 

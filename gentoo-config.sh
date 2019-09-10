@@ -15,7 +15,6 @@ LVM_DEVICE='/dev/nvme0n1p2'
 OS_DEVICE='/dev/nvme0n1'
 
 #- Network config -#
-MIRROR_SERVER_ADDRESS='192.168.1.103'
 MIRROR_REGION='North America'
 ETH0_DEVICE='enp10s0'
 ETH0_ADDRESS='192.168.1.104'
@@ -52,6 +51,8 @@ DRACUT_KERNEL_MODULES='efivarfs igb nvme-core nvme nvidia iptable_nat bpfilter t
 OS_INPUT="libinput joystick mouse"  # needs to be hardcoded
 OS_GUI="kde"                        # unused currently
 OS_BOOT_TYPE="grub"                 # unused currently
+# You must escape variables in this var due to how variable expansion works in bash
+OS_GLOBAL_USE='\${ARCH} X posix nptl smp avahi curl ipv6 acpi hddtemp libnotify lm_sensors pam readline syslog unicode usb openssl alsa kde pm-utils dbus policykit udisks lvm ffmpeg opus gstreamer gles egl vdpau nvidia opencv uvm gtk3 cron wayland 7zip python java ruby networkmanager pulseaudio v4l vaapi x265 theora zeroconf samba cgroups AArch64 -gnome -static -systemd -bindist -handbook -pulseaudio'
 
 #- Internal script settings -#
 # Do not change these

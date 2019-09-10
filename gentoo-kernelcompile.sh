@@ -94,3 +94,6 @@ EOF
 echo 'Installing grub...'
 grub-install $OS_DEVICE --efi-directory=/boot/efi --target=x86_64-efi --no-floppy
 grub-mkconfig -o /boot/grub/grub.cfg
+
+echo 'Enabling LVM service...'
+rc-update lvm add boot

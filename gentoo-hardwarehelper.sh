@@ -136,7 +136,8 @@ function sound_vendors() {
 					  "turtle beach maui,wavefront;"\
 					  "turtle beach multisound,msnd-pinnacle;"\
 					  "turtle beach tropez,wavefront;"\
-					  "yamaha ymf,ymfpci;")
+					  "yamaha ymf,ymfpci;"\
+					  "intel hd audio,hda-intel;")
 	
 	IFS=';'
 	OS_SOUND=$(for SOUND_ENTRY in $SOUND_TABLE
