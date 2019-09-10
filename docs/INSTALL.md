@@ -56,7 +56,7 @@ You can use **PuTty** -> [link](https://www.chiark.greenend.org.uk/~sgtatham/put
 
 ### Hosting the installation tarballs
 
-This section is detailed in the [Customization Guide](CUSTOM.md) , as it is part of that step.
+**Update**: This feature has been deprecated as it is done automatically for the user using mirrorselect to pick the fastest mirror near your location and download the tarballs from it!  You no longer have to worry about this step.
 
 ### Uploading the files
 

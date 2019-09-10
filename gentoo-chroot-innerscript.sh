@@ -21,7 +21,7 @@ locale-gen
 #- GENTOO ESELECT REPOSITORY -#
 emerge app-eselect/eselect-repository
 mkdir -p /etc/portage/repos.conf/
-eselect repository add gentoo
+eselect repository enable gentoo
 emerge --sync
 
 #- KERNEL -#

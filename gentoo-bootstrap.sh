@@ -30,10 +30,10 @@ emerge alsa-utils media-libs/alsa-lib alsa-plugins alsa-tools pulseaudio
 echo 'Installing display manager...'
 emerge sys-fs/udisks sys-auth/polkit sys-auth/consolekit x11-misc/sddm 
 echo 'Installing KDE Plasma...'
-emerge kde-plasma/plasma-meta kde-plasma/kdeplasma-addons 
+emerge kde-plasma/plasma-meta kde-plasma/kdeplasma-addons kde-apps/kde-apps-meta
 emerge --changed-use kde-plasma/systemsettings
 echo 'Upgrade to Plasma 5 stable / apps...'
-emerge @kde-plasma @kde-frameworks @kdeutils @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
+emerge @kde-frameworks @kdeutils @kde-baseapps @kde-applications @kdesdk @kdepim @kdemultimedia @kdegraphics @kdegames @kdeaccessibility @kdenetwork @kdeedu @kdeadmin x11-plugins/pidgin-indicator net-im/pidgin
 
 #- SUDO OFF, SUDO ON -#
 # Its like a flavor of martial arts or somethin

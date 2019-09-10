@@ -50,7 +50,15 @@ To edit the configuration, edit the here documents ( ``cat<<'EOF'`` ) lines in `
 To add your own custom kernel configuration, you can make the following changes:
 
 1.  Replace the contents of kernel-config.txt with your own.
-2.  Replace according emerge line in ``gentoo-chroot-innerscript.sh`` to install the sources for the kernel you want to compile.  The default is ``ck-sources`` for **Linux-CK** for optimized desktop systems.
+2.  Edit the values in ``gentoo-config.sh`` according to the following table:
+
+| Option | Use | Default | Autovar[5]
+| --- | --- | --- | --- |
+**KERNEL_RELEASE_VER** | Set to the name of the kernel release. | gentoo | No
+**KERNEL_FULL_VER** | Set to the full version of the kernel release you would like to install. | 5.2.8 | No
+**KERNEL_MINOR_VER** | Do not change this line.  It is automatic. | code | Yes
+
+[5] Autovars are set automatically by code and should not be changed.
 
 > **NOTE**: This script does no sanity checking whatsover, please make sure that your kernel compiles without
 > help first !
@@ -61,7 +69,6 @@ You can modify ``gentoo-config.sh`` underneath the initramfs section accordingly
 
 | Option | Use | Default | Autovar[2]
 | --- | --- | --- | --- |
-**DRACUT_KVER** | Kernel version | ``5.1.7-ck`` | No
 **DRACUT_MODULES** | Dracut modules which should load in addition to your host's configuration. | ``lvm dm`` | No
 **DRACUT_KERNEL_MODULES** | Modules from your kernel which should load accordingly. | ``efivarfs igb bluetooth nvme-core nvme nvidia thunderbolt-net iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin vfio vfio_iommu_type1 vfio-pci`` | No
 
@@ -83,16 +90,10 @@ You can customize your system language by editing the locale configuration optio
 
 You can custimze some of the script's network configuration using these options.
 
+**UPDATE:** Due to the use of NetworkManager in future iterations of GentooDAD, dhclient is used and sets up networking automatically using a DHCP server.  You no longer have to worry about configuring most settings here.
+
 | Option | Use | Default | Autovar[4]
 | --- | --- | --- | --- |
-**MIRROR_SERVER_ADDRESS** | ``links`` will use this address to call up a tarballl mirror page.  I have this set to a LAN IP to host locally. | ``192.168.1.103`` | No
-**ETH0_DEVICE** | First Ethernet adapter device name | ``enp10s0`` | No
-**ETH0_ADDRESS** | First Ethernet adapter static IP | ``192.168.1.104`` | No
-**ETH0_NETMASK** | First Ethernet adapter netmask | ``255.255.254.0`` | No
-**ETH1_DEVICE** | Second Ethernet adapter device name | ``enp0s31f6`` | No
-**ETH1_ADDRESS** | Second Ethernet adapter static IP | ``192.168.1.105`` | No
-**ETH1_NETMASK** | Second Ethernet adapter netmask | ``255.255.254.0`` | No
-**GATEWAY_ADDRESS** | Gateway IP address | ``192.168.1.1`` | No
 **DNS1_ADDRESS** | Primary DNS server | ``8.8.8.8`` | No
 **DNS2_ADDRESS** | Secondary DNS server | ``8.8.4.4`` | No
 
@@ -112,13 +113,7 @@ You can change some details of the default user account that is created during t
 
 ### Hosting the Installation Tarballs
 
-For hosting the tarballs for the installatiion, you have **a few options**:
-
-#### Using gentoo's Installation Mirrors with ``links``:
-
-Set ``MIRROR_SERVER_ADDRESS`` in ``gentoo-config.sh`` to a mirror of your choice from [this page](https://www.gentoo.org/downloads/mirrors/)
-
-No further configuration is required with this method.
+**Update:** This feature is depricated.  The Stage 3 fetch and portage snapshot download is now an automated process you no longer have to worry about.  If you have already downloaded the tarballs using GentooDAD, this script will recognize their existance, and you will not have to download them twice.  (mirror web administrator friendly!)
 
 #### Configuring Portage Mirrors
 
@@ -128,53 +123,43 @@ The default is ``North America``.
 
 #### Hosting the files locally:
 
-You can use a LAN-side HTTP server running on a laptop to host your files.  I used a basic Bitnami WAMP stack.  I left this section of the guide open.
-As long as your server is capable of hosting files and accessable on your LAN, it will work for this step of the installation.
-
-Here is a basic 'Download Page' template you can use for ``index.html``
-
-```
-<!DOCTYPE html>
-<HEAD>
-	<TITLE>Gentoo Install Files</TITLE>
-</HEAD>
-<BODY>
-	<H1>Gentoo Installation Files</H1>
-	<LIST>
-	<LI><A HREF="files/gentoo-install.sh">Installer Script</A></LI>
-	<LI><A HREF="files/stage3-amd64-hardened-20190811T214502Z.tar.xz">Stage 3 Tarball</A></LI>
-	<LI><A HREF="files/portage-latest.tar.xz">Portage Latest Snapshot</A></LI>
-	</LIST>
-</BODY>
-```
-
-Modify it as need-be.  It links inside of the ``files/`` directory in ``htdocs`` .  Put the tarballs in that folder, change the filenames, and host your LAN HTTP server on a laptop or another computer.  You can then browse this directory during the install process and quickly download the tarballs over LAN.  (Useful for debugging!)
-
-Set ``MIRROR_SERVER_ADDRESS`` in ``gentoo-config.sh`` to the LAN IP of your HTTP server.
+**Update:** This feature is depricated due to its delicate and advanced nature, it has been phased out of the main installation in favor of a more smart, automatic method with a proper download cache.
 
 ### CPU Configuration
 
-This functionality is **in beta**.  Currently, ``sys-firmware/intel-microcode`` is installed for Intel CPUs.  Configuration values do not currently exist for the CPU.  This will change.
+This functionality is **in staging**.  Currently, ``sys-firmware/intel-microcode`` is installed for Intel CPUs.  Configuration values do not currently exist for the CPU.  This will change.
 
 **AMD Users**
 
-- ``gentoo-chroot-innerscript.sh`` Install ``sys-firmware/amd-microcode`` instead of ``sys-firmware/intel-microcode`` .
-
-``CPU_FLAGS_X86`` automatic setting.  You don't have to worry about configuring this value.  Its done for you with ``cpuid2cpuflags``
-``ARCH`` and ``USE`` flag for your system arcitechture is configured automatically.  No need to put anything here.
+- ``gentoo-kernelcompile.sh`` Install ``sys-firmware/amd-microcode`` instead of ``sys-firmware/intel-microcode`` .
 
 > **Note:** My apologies for the beta instructions here.  This functionality will become a configuration option soon.
 
 ### GPU Configuration
 
-This functionality is **in beta**  Currently, ``nvidia`` proprietary drivers are installed for X. 
+This functionality is **in staging**  Currently, ``nvidia`` proprietary drivers are installed for X. 
 
 **Update:** GPU ``VIDEO_CARDS`` is configured automatically.  AMD users must still make some changes.  This will change.
 
 **AMD GPU Users**
 
-- ``gentoo-chroot-innerscript.sh`` Install the X11 AMD drivers instead of the NVIDIA X11 Drivers.
-- ``gentoo-chroot-innerscript.sh`` Remove nvidia-xconfig invocation line.
+- ``gentoo-kernelcompile.sh`` Install the X11 AMD drivers instead of the NVIDIA X11 Drivers.
+- ``gentoo-kernelcompile.sh`` Remove nvidia-xconfig invocation line.
 - ``gentoo-injectconfig.sh`` Here-docment for ``package.use`` and ``package.license`` ``nvidia`` should be changed so that AMD drivers will install without issues.
 
 > **Note:** My apologies for the beta instructions here.  This functionality will become a configuration option soon.
+
+### Sound cards
+
+THis functionality is **in beta** and works for some older cards.  If you have a problem with it, please file an issue ticket to have your sound card added to my database.
+
+Your sound card is detected automatically via lspci and lsusb in the chroot and added to ``ALSA_CARDS`` automatically.
+
+> **Note** THe system is currently configured to use ``alsa`` and ``pulseaudio``, to make any further changes to the system requires some significant changes.  This is a planned feature.
+
+### Input devices
+
+Currently, you must set ``OS_INPUT`` in ``gentoo-config.sh`` to the input libraries you wish to use.
+
+The default values are ``libinput joystick mouse``
+
