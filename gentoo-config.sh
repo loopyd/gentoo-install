@@ -45,7 +45,7 @@ OS_INPUT="libinput joystick mouse"  # needs to be hardcoded
 OS_GUI="kde"                        # unused currently
 OS_BOOT_TYPE="grub"                 # unused currently
 # You must escape variables in this var due to how variable expansion works in bash
-OS_GLOBAL_USE='\${ARCH} X posix nptl smp avahi curl ipv6 acpi hddtemp libnotify lm_sensors pam readline syslog unicode usb openssl alsa kde pm-utils dbus policykit udisks lvm ffmpeg opus gstreamer gles egl vdpau nvidia opencv uvm gtk3 cron wayland 7zip python java ruby networkmanager pulseaudio v4l vaapi x265 theora zeroconf samba cgroups AArch64 -gnome -static -systemd -bindist -handbook -pulseaudio'
+OS_GLOBAL_USE='\${ARCH} X posix nptl smp avahi curl ipv6 acpi hddtemp libnotify lm_sensors pam readline syslog unicode usb alsa kde pm-utils dbus policykit udisks lvm ffmpeg opus gstreamer gles egl vdpau nvidia opencv uvm gtk3 cron wayland 7zip openssl networkmanager v4l vaapi x265 theora zeroconf samba cgroups AArch64 -gnome -static-libs -systemd -bindist -pulseaudio -handbook -ruby-targets-ruby23 -python-targets-python27'
 
 #- Internal script settings -#
 # Do not change these

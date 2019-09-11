@@ -62,6 +62,22 @@ cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/portage
 app-portage/layman sync-plugin-portage
 EOF
 
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/dev
+dev-libs/openssl bindist ~amd64
+sys-fs/udisks introspection lvm vdo
+sys-libs/libblockdev vdo lvm
+sys-auth/polkit consolekit introspection
+sys-auth/consolekit policykit acl pm-utils evdev
+dev-libs/libpcre2 pcre16
+x11-libs/libxcb xkb
+dev-lang/python sqlite
+x11-libs/libdrm libkms
+EOF
+
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.mask/dev
+>=dev-libs/openssl-1.1.0j
+EOF
+
 #--- fixes for KDE build. ---#
 echo 'Copying KDE package configuration...'
 cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/kde
@@ -70,25 +86,25 @@ net-misc/dropbox CC-BY-ND-3.0 dropbox
 EOF
 
 cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.accept_keywords/kde
-dev-libs/openssl ~amd64
 x11-plugins/pidgin-indicator ~amd64
 EOF
  
 cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/kde
-dev-lang/python sqlite
-x11-libs/libdrm libkms
 net-libs/telepathy-qt farstream
 media-plugins/gst-plugins-meta v4l theora
 media-libs/gst-plugins-base v4l theora
 kde-plasma/plasma-meta browser-integration crypt display-manager grub gtk pam wallpapers sdk sddm consolekit pm-utils legacy-systray
 kde-plasma/kde-cli-tools kdesu
-sys-fs/udisks introspection lvm vdo
-sys-libs/libblockdev vdo lvm
-sys-auth/polkit consolekit introspection
-sys-auth/consolekit policykit acl pm-utils evdev
-dev-libs/libpcre2 pcre16
 app-text/xmlto text
-x11-libs/libxcb xkb
+EOF
+
+cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/tmp-circular-fixes
+x11-libs/gtk+ -cups
+net-print/cups -zeroconf
+net-dns/avahi -gtk
+sys-libs/ncurses -gpm
+media-libs/mesa -gallium
+sys-fs/eudev -introspection
 EOF
 
 #- Fstab -#

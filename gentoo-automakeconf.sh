@@ -14,6 +14,7 @@ CXXFLAGS="${COMMON_FLAGS}"
 FCFLAGS="${COMMON_FLAGS}"
 FFLAGS="${COMMON_FLAGS}"
 CHOST="x86_64-pc-linux-gnu"
+LC_MESSAGES=C
 ABI_X86=""
 MAKEOPTS=""
 CPU_FLAGS_X86=""
@@ -24,8 +25,10 @@ PORTAGE_TMPDIR="/var/tmp/portage"
 EMERGE_DEFAULT_OPTS="--jobs 6 --with-bdeps-auto=y --deep --autounmask=y --autounmask-write=y --autounmask-backtrack=y --quiet=y --keep-going=y" 
 GENTOO_MIRRORS=""
 
+USE=""
 ACCEPT_LICENSE="-* @FREE @BINARY-REDISTRIBUTABLE"
-LC_MESSAGES=C
+
+RUBY_TARGETS="ruby24 ruby26"
 
 VIDEO_CARDS=""
 INPUT_DEVICES=""

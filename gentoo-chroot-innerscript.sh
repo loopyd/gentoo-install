@@ -72,7 +72,7 @@ EOFDOC
 
 #- INSTALL XORG BASE -#
 echo 'Installing XORG base...'
-emerge x11-base/xorg-server x11-apps/xinit net-misc/x11-ssh-askpass
+emerge x11-base/xorg-server x11-apps/xinit net-misc/x11-ssh-askpass net-misc/networkmanager
 
 #- ENABLE SERVICES -#
 # Without configuring these to start, we won't get past login
