@@ -56,57 +56,6 @@ mkdir --parents $CHROOT_MOUNT/var/db/repos/gentoo >/dev/null 2>&1
 echo 'Copying portage repo configuration...'
 cp $CHROOT_MOUNT/usr/share/portage/config/repos.conf $CHROOT_MOUNT/etc/portage/repos.conf/gentoo.conf
 
-#-- fixes for portage --#
-echo 'Copying portage package configuration...'
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/portage
-app-portage/layman sync-plugin-portage
-EOF
-
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/dev
-dev-libs/openssl bindist ~amd64
-sys-fs/udisks introspection lvm vdo
-sys-libs/libblockdev vdo lvm
-sys-auth/polkit consolekit introspection
-sys-auth/consolekit policykit acl pm-utils evdev
-dev-libs/libpcre2 pcre16
-x11-libs/libxcb xkb
-dev-lang/python sqlite
-x11-libs/libdrm libkms
-EOF
-
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.mask/dev
->=dev-libs/openssl-1.1.0j
-EOF
-
-#--- fixes for KDE build. ---#
-echo 'Copying KDE package configuration...'
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.license/kde
-media-libs/faac MPEG-4
-net-misc/dropbox CC-BY-ND-3.0 dropbox
-EOF
-
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.accept_keywords/kde
-x11-plugins/pidgin-indicator ~amd64
-EOF
- 
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/kde
-net-libs/telepathy-qt farstream
-media-plugins/gst-plugins-meta v4l theora
-media-libs/gst-plugins-base v4l theora
-kde-plasma/plasma-meta browser-integration crypt display-manager grub gtk pam wallpapers sdk sddm consolekit pm-utils legacy-systray
-kde-plasma/kde-cli-tools kdesu
-app-text/xmlto text
-EOF
-
-cat <<'EOF' > $CHROOT_MOUNT/etc/portage/package.use/tmp-circular-fixes
-x11-libs/gtk+ -cups
-net-print/cups -zeroconf
-net-dns/avahi -gtk
-sys-libs/ncurses -gpm
-media-libs/mesa -gallium
-sys-fs/eudev -introspection
-EOF
-
 #- Fstab -#
 # Put the knife down, dave!
 #

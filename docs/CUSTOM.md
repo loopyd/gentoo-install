@@ -143,11 +143,7 @@ This functionality is **in staging**  Currently, ``nvidia`` proprietary drivers 
 
 **AMD GPU Users**
 
-- ``gentoo-kernelcompile.sh`` Install the X11 AMD drivers instead of the NVIDIA X11 Drivers.
-- ``gentoo-kernelcompile.sh`` Remove nvidia-xconfig invocation line.
-- ``gentoo-injectconfig.sh`` Here-docment for ``package.use`` and ``package.license`` ``nvidia`` should be changed so that AMD drivers will install without issues.
-
-> **Note:** My apologies for the beta instructions here.  This functionality will become a configuration option soon.
+> **IMPORTANT**: This feature is not currently supported.  Please see [Notice for andgpu Users](AMDUSERS.md) for details.
 
 ### Sound cards
 
@@ -155,11 +151,10 @@ THis functionality is **in beta** and works for some older cards.  If you have a
 
 Your sound card is detected automatically via lspci and lsusb in the chroot and added to ``ALSA_CARDS`` automatically.
 
-> **Note** THe system is currently configured to use ``alsa`` and ``pulseaudio``, to make any further changes to the system requires some significant changes.  This is a planned feature.
+> **Note** The system is currently configured to use ``alsa`` and ``pulseaudio``, to make any further changes to the system requires some significant changes.  This is a planned feature.
 
 ### Input devices
 
 Currently, you must set ``OS_INPUT`` in ``gentoo-config.sh`` to the input libraries you wish to use.
 
-The default values are ``libinput joystick mouse``
-
+The default values are ``libinput joystick mouse``.

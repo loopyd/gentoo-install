@@ -27,10 +27,10 @@ function gpu_vendors () {
 		OS_GPU="nvidia ${OS_GPU}"
 	fi
 	if lspci -v | grep -i vga | grep -i amd >/dev/null && ! lspci -v | grep -i vga | grep -i amd | grep -i radeon >/dev/null ; then
-		OS_GPU="amd ${OS_GPU}"
+		OS_GPU="amdgpu ${OS_GPU}"
 	fi
 	if lspci -v | grep -i 'vga' | grep -i radeon >/dev/null ; then
-		OS_GPU="radeon ${OS_GPU}"
+		OS_GPU="radeonsi ${OS_GPU}"
 	fi
 	if [[ $(cpu_vendor) =~ .*intel.* ]]; then
 		OS_GPU="intel ${OS_GPU}"
