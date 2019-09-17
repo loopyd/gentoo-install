@@ -37,7 +37,7 @@ KERNEL_MINOR_VER=$(echo -n $KERNEL_FULL_VER | cut -d'.' -f1-2)
 
 # Dracut config
 DRACUT_MODULES='lvm dm'
-DRACUT_KERNEL_MODULES='efivarfs igb nvme-core nvme nvidia iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin snd-mixer-oss snd-pcm-oss snd-seq-oss snd-seq-midi-event snd-seq snd-hrtimer snd-hwdep snd-pcm snd-rawmidi snd-seq-device snd-timer snd snd-hda-ext-core snd-hda-core snd-usb-audio snd-usbmidi-lib snd-hda-codec-generic snd-hda-intel snd-usb-audio snd-hda-codec-hdmi snd-hda-codec-ca0132'
+DRACUT_KERNEL_MODULES='efivarfs igb nvme-core nvme nvidia iptable_nat bpfilter team team_mode_broadcast team_mode_loadbalance team_mode_roundrobin'
 
 #- System options -#
 # This section is BETA.
@@ -45,7 +45,7 @@ OS_INPUT="libinput joystick mouse"  # needs to be hardcoded
 OS_GUI="kde"                        # unused currently
 OS_BOOT_TYPE="grub"                 # unused currently
 # You must escape variables in this var due to how variable expansion works in bash
-OS_GLOBAL_USE='\${ARCH} X posix nptl smp avahi curl ipv6 acpi hddtemp libnotify lm_sensors pam readline syslog unicode usb alsa kde pm-utils dbus policykit udisks lvm ffmpeg opus gstreamer gles egl vdpau nvidia opencv uvm gtk3 cron wayland 7zip openssl networkmanager v4l vaapi x265 theora zeroconf samba cgroups AArch64 -gnome -static-libs -systemd -bindist -pulseaudio -handbook -ruby-targets-ruby23 -python-targets-python27'
+OS_GLOBAL_USE='\${ARCH} X posix nptl smp avahi curl ipv6 acpi hddtemp libnotify lm_sensors pam readline syslog unicode usb alsa kde pm-utils dbus policykit udisks lvm ffmpeg nvidia opencv uvm gtk3 cron 7zip openssl networkmanager samba cgroups AArch64 -gnome -static-libs -systemd -bindist -handbook -ruby-targets-ruby23 -python-targets-python27'
 
 #- Internal script settings -#
 # Do not change these
