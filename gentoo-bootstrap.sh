@@ -35,8 +35,8 @@ echo 'Installing KDE Plasma...'
 #
 # The following patch is applied to kernel headers >= 5.2 .
 #
-mkdir --parents /etc/portage/patches/dev-qt/qtwebengine-5
-cat <'EOF' > /etc/portage/patches/dev-qt/qtwebengine-5.12.4/linux-headers-5.2.patch 
+mkdir --parents /etc/portage/patches/dev-qt/qtwebengine-5.12.4/
+cat <<'EOF' > /etc/portage/patches/dev-qt/qtwebengine-5.12.4/linux-headers-5.2.patch 
 --- a/src/3rdparty/chromium/third_party/webrtc/rtc_base/physicalsocketserver.cc
 +++ b/src/3rdparty/chromium/third_party/webrtc/rtc_base/physicalsocketserver.cc
 @@ -67,6 +67,7 @@ typedef void* SockOptArg;
@@ -55,7 +55,7 @@ EOF
 # This reduce build time from 17 hours to 9 for tmpfs portage with > 10GB dedicated
 # RAM and at least 7 CPU threads.
 #
-cat <'EOF' >> /etc/portage/package.use/zz-autounmask
+cat <<'EOF' >> /etc/portage/package.use/zz-autounmask
 >=dev-qt/qtwebengine-5.12.4 jumbo-build system-ffmpeg system-icu
 EOF
 
