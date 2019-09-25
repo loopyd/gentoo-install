@@ -267,6 +267,7 @@ function fetch_tarball_wrapper() {
 			rm -f $CHROOT_MOUNT/root/${MIRROR_TARBALL_URI##*/}
 			echo -ne "\033[5D${TEXT_OK}clean${TEXT_NORMAL} [${TEXT_BOLD}${TEXT_OK}done${TEXT_NORMAL}]"
 			sleep 3
+			break
 		else
 			echo -ne "\033[5D${TEXT_ERROR}fetch${TEXT_BOLD} Retrying with another mirror...${TEXT_NORMAL}"
 			sleep 3

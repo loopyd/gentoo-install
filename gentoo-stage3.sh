@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo -ne "${TEXT_BOLD}Installing Stage3${TEXT_NORMAL}\n\n    This process can take a long time depending on the speed of your Internet.\n    I will try the 3 closest mirrors.  If you recieve a crash\n    please check your installation media's network connection.\n\n\n\033]1A"
+echo -ne "${TEXT_BOLD}Installing Stage3${TEXT_NORMAL}\n\n    This process can take a long time depending on the speed of your Internet.\n    I will try the 3 closest mirrors.  If you recieve a crash\n    please check your installation media's network connection.\n\n\n\033[1A"
 
 timer_init
 
