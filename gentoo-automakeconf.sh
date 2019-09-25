@@ -3,7 +3,7 @@
 #- AUTO MAKE CONFIGULATOR! -#
 #
 echo "${TEXT_BOLD}${TEXT_WARNING}EMERGE:${TEXT_NORMAL}${TEXT_BOLD}  Emering cpuinfo2cpuflags...${TEXT_NORMAL}"
-emerge app-portage/cpuid2cpuflags
+emerge app-portage/cpuinfo2cpuflags
 
 echo "${TEXT_BOLD}${TEXT_WARNING}COPY:${TEXT_NORMAL}${TEXT_BOLD}  Copying base make.conf${TEXT_NORMAL}"
 cat <<'EOF' > $CHROOT_MOUNT/etc/portage/make.conf

@@ -74,7 +74,7 @@ tmpfs /var/tmp/portage tmpfs rw,nosuid,noatime,nodev,mode=755,size=16G,uid=porta
 efivarfs /sys/firmware/efi/efivars efivarfs rw,nosuid,nodev,noexec,relatime 0 0
 EOF
 
-cp -f ./kernel-config.txt $CHROOT_MOUNT/root/kernel-config.txt
+# cp -f ./kernel-config.txt $CHROOT_MOUNT/root/kernel-config.txt
 cp -f ./*.sh $CHROOT_MOUNT/root
 chmod +x $CHROOT_MOUNT/root/*.sh
 

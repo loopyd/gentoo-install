@@ -1,9 +1,11 @@
 #!/bin/bash
+
 env-update
 source /etc/profile
 export PS1="(chroot) $PS1"
 
 . /root/gentoo-config.sh
+. /root/gentoo-wrappers.sh
 
 #- INITIAL WEBRSYNC -#
 emerge-webrsync
@@ -18,11 +20,13 @@ locale-gen
 emerge app-eselect/eselect-repository
 mkdir -p /etc/portage/repos.conf/
 eselect repository enable gentoo
+echo 'Syncing repository...'
 emerge --sync
+emerge flaggie
 
-#- EMERGE FIRST BOOT DEPENDENCIES -#
-echo 'Emerging first-boot dependencies...'
-emerge --newuse --deep =sys-kernel/$KERNEL_RELEASE_VER-sources-$KERNEL_FULL_VER =sys-kernel/linux-headers-$KERNEL_MINOR_VER dracut virtual/udev sys-boot/grub:2 lvm2 os-prober sys-apps/pciutils sys-apps/usbutils sys-apps/hwinfo sys-fs/dosfstools xfsprogs e2fsprogs app-shells/gentoo-bashcomp app-benchmarks/bootchart2 app-admin/killproc sys-process/acct sys-fs/btrfs-progs sys-block/open-iscsi sys-fs/mdadm sys-fs/multipath-tools sys-block/nbd net-fs/nfs-utils net-nds/rpcbind app-shells/gentoo-bashcomp sys-fs/udisks sys-auth/polkit sys-auth/consolekit x11-base/xorg-drivers x11-base/xorg-server x11-apps/xinit net-misc/x11-ssh-askpass net-misc/networkmanager app-admin/sudo app-admin/syslog-ng app-admin/logrotate sys-process/cronie alsa-utils media-libs/alsa-lib alsa-plugins alsa-tools pulseaudio
+#- KERNEL -#
+# NEW: All of this now automatic and in the wrapper, whew...
+. /root/gentoo-scriptwrapper.sh 'Compiling kernel' '. /root/gentoo-kernelcompile.sh'
 
 #- CONFIGURE SERVICES -#
 sed -i 's/threaded(yes)/threaded(no)/g' /etc/syslog-ng/syslog-ng.conf 
@@ -165,25 +169,27 @@ root ALL=(ALL) ALL
 #includedir /etc/sudoers.d
 EOFDOC
 
-#- KERNEL -#
-# NEW: All of this now automatic and in the wrapper, whew...
-. /root/gentoo-scriptwrapper.sh 'Compiling kernel' '. /root/gentoo-kernelcompile.sh'
-
 #- USER ACCOUNT SETUP -#
 echo 'Setting up user account: '"$USERNAME"
-useradd $USERNAME -g users -G wheel,video,audio,root,sys,disk,adm,sddm,bin,daemon,tty,portage,console,plugdev,usb,cdrw,cdrom,input,lp,uucp -d /home/$USERNAME -s /bin/bash 
-mkdir /home/$USERNAME
-cp -a /etc/skel/. /home/$USERNAME/.
-chown -R $USERNAME /home/$USERNAME
+
+useradd -m -G wheel,video,audio,root,sys,disk,adm,sddm,bin,daemon,tty,portage,console,plugdev,usb,cdrw,cdrom,input,lp,uucp -s /bin/bash $USERNAME
 echo -e "$PASSWORD\n$PASSWORD" | passwd $USERNAME
 
-. /root/gentoo-scriptwrapper.sh 'Enabling autologin' '. /root/gentoo-autologin.sh "root" "enable"'
+#- ENABLE SERVICES -#
+# Without configuring these to start, we won't get past login
+# I went through a broken system's dmesg | grep for a little
+# while to get this list of needy, red headed stepchildren.
+#
+rc-update add lvm boot
+rc-update add mdraid boot
+rc-update add alsasound boot
+rc-update add dbus boot
+rc-update add elogind boot
+rc-update add syslog-ng default 
+rc-update add cronie default
+rc-update add acpid default
+rc-update add NetworkManager default
+rc-update add sshd default
+rc-update add bootchart2 default
 
-#- MAKE THE KICKER EXECUTABLE -#
-# This script will not be made executable until reboot time.
-cat <<INNERSCRIPT > /etc/profile.d/gentoo-bootkicker.sh
-#!/bin/bash
-/root/gentoo-bootstrap.sh
-reboot
-INNERSCRIPT
-chmod +x /etc/profile.d/gentoo-bootkicker.sh
+# . /root/gentoo-scriptwrapper.sh 'Enabling autologin' '. /root/gentoo-autologin.sh "root" "enable"'

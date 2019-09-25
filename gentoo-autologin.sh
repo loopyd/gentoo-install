@@ -20,6 +20,14 @@ EOFDOC
 	rc-config delete agetty
 	cp /etc/init.d/agetty /root/agetty.backup
 	rc-update add agetty-autologin default 
+	#- MAKE THE KICKER EXECUTABLE -#
+# This script will not be made executable until reboot time.
+cat <<INNERSCRIPT > /etc/profile.d/gentoo-bootkicker.sh
+#!/bin/bash
+/root/gentoo-bootstrap.sh
+reboot
+INNERSCRIPT
+chmod +x /etc/profile.d/gentoo-bootkicker.sh
 }
 
 function disable_autologin () {
